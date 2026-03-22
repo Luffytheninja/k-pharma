@@ -1,0 +1,21 @@
+{
+  "name": "K-Pharma",
+  "short_name": "KPharma",
+  "description": "Professional Pharmacy Tool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#004d40",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
