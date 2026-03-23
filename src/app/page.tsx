@@ -26,7 +26,27 @@ const TRANSITIONS: Record<View, { initial: object; exit: object }> = {
 };
 
 export default function Home() {
-  const [isAuthed, setIsAuthed] = useState<boolean | null>(null); // null = checking, false = show auth
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
+  const [authMode, setAuthMode] = useState<"login" | "update_password" | "onboarding" | undefined>(undefined);
+
+  const checkOnboardingStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("pharmacies")
+        .select("id")
+        .eq("owner_id", userId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      setIsOnboarded(!!data);
+      if (!data) setAuthMode("onboarding");
+    } catch (e) {
+      console.error("Onboarding check failed:", e);
+      setIsOnboarded(false);
+      setAuthMode("onboarding");
+    }
+  };
   const [view, setView] = useState<View>("dashboard");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState("");
@@ -42,20 +62,26 @@ export default function Home() {
   // DEEP DEBUG NET
   const [globalError, setGlobalError] = useState("");
 
-  const [authMode, setAuthMode] = useState<"login" | "update_password" | undefined>(undefined);
-
   useEffect(() => {
     setMounted(true);
     
     // Auth Listener
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthed(!!session);
+      if (session?.user) {
+        checkOnboardingStatus(session.user.id);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthed(!!session);
       if (event === "PASSWORD_RECOVERY") {
         setAuthMode("update_password");
+      }
+      if (session?.user) {
+        checkOnboardingStatus(session.user.id);
+      } else {
+        setIsOnboarded(null);
       }
     });
 
@@ -134,9 +160,18 @@ export default function Home() {
 
   if (!mounted) return null;
 
-  if (isAuthed === null) return null; // Still checking session
-  if (isAuthed === false || authMode === "update_password") {
-    return <AuthScreen initialMode={authMode} onSuccess={() => { setIsAuthed(true); setAuthMode(undefined); }} />;
+  if (isAuthed === false || (isAuthed === true && isOnboarded === false) || authMode === "update_password" || authMode === "onboarding") {
+    return (
+      <AuthScreen 
+        initialMode={authMode || (isAuthed && !isOnboarded ? "onboarding" : "login")} 
+        onSuccess={() => { 
+          setIsAuthed(true); 
+          setIsOnboarded(null); // Trigger re-check
+          if (authMode === "update_password") setAuthMode(undefined);
+          else if (authMode === "onboarding") setAuthMode(undefined);
+        }} 
+      />
+    );
   }
 
   return (
