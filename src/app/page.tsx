@@ -17,14 +17,6 @@ import { supabase } from "@/lib/supabase";
 
 type View = "dashboard" | "verify" | "inventory" | "alerts" | "logs";
 
-const TRANSITIONS: Record<View, { initial: object; exit: object }> = {
-  dashboard: { initial: { opacity: 0 }, exit: { opacity: 0 } },
-  verify: { initial: { x: "100%" }, exit: { x: "100%" } },
-  inventory: { initial: { y: "100%" }, exit: { y: "100%" } },
-  alerts: { initial: { y: "100%" }, exit: { y: "100%" } },
-  logs: { initial: { y: "100%" }, exit: { y: "100%" } },
-};
-
 export default function Home() {
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
