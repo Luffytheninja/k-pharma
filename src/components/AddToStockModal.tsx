@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Package } from "lucide-react";
 import { Drug } from "@/lib/types";
-import { addBatch } from "@/lib/store";
+import { addBatch, cacheDrug } from "@/lib/store";
 
 interface AddToStockModalProps {
   drug: Drug;
@@ -15,6 +15,11 @@ interface AddToStockModalProps {
 export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockModalProps) {
   const [quantity, setQuantity] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [costPrice, setCostPrice] = useState(drug.cost_price ? String(drug.cost_price) : "");
+  const [sellingPrice, setSellingPrice] = useState(drug.selling_price ? String(drug.selling_price) : "");
+  const [reorderPoint, setReorderPoint] = useState(drug.reorder_point ? String(drug.reorder_point) : "10");
+  const [avgDailyUsage, setAvgDailyUsage] = useState(drug.avg_daily_usage ? String(drug.avg_daily_usage) : "1");
+  
   const [error, setError] = useState("");
 
   const handleSave = () => {
@@ -22,10 +27,15 @@ export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockMo
     if (!qty || qty <= 0) { setError("Enter a valid quantity"); return; }
     if (!expiryDate) { setError("Expiry date is required"); return; }
     
-    // Very lenient check just to prevent completely invalid dates:
     const exDateObj = new Date(expiryDate);
     if (isNaN(exDateObj.getTime())) { setError("Please enter a valid date"); return; }
 
+    const cost = parseFloat(costPrice) || 0;
+    const sell = parseFloat(sellingPrice) || 0;
+    const reorder = parseInt(reorderPoint, 10) || 10;
+    const usage = parseInt(avgDailyUsage, 10) || 1;
+
+    // 1. Log the individual batch tracking
     addBatch({
       drug_id: drug.nafdac_number,
       drug_name: drug.name,
@@ -34,10 +44,18 @@ export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockMo
       expiry_date: expiryDate,
     });
 
+    // 2. Globally update the drug profile with new pricing / settings
+    cacheDrug({
+      ...drug,
+      cost_price: cost,
+      selling_price: sell,
+      reorder_point: reorder,
+      avg_daily_usage: usage,
+    });
+
     onAdded();
   };
 
-  // Min date = tomorrow
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split("T")[0];
@@ -54,10 +72,9 @@ export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockMo
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-[32px] shadow-2xl"
+        className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-[32px] shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="p-6">
-          {/* Handle */}
           <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6" />
 
           <div className="flex items-center justify-between mb-6">
@@ -76,48 +93,50 @@ export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockMo
           </div>
 
           <div className="flex flex-col gap-4">
-            {/* Quantity */}
-            <div>
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">
-                Quantity (units)
-              </label>
-              <input
-                type="number"
-                inputMode="numeric"
-                placeholder="e.g. 100"
-                value={quantity}
-                onChange={(e) => { setQuantity(e.target.value); setError(""); }}
-                className="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl px-4 text-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#004d40]/30 focus:border-[#004d40]/50 transition"
-              />
+            {/* Batch Level inputs */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">Qty Received</label>
+                <input type="number" inputMode="numeric" placeholder="0" value={quantity} onChange={(e) => { setQuantity(e.target.value); setError(""); }} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-lg font-bold focus:outline-none focus:border-[#004d40]" />
+              </div>
+              <div>
+                <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">Expiry Date</label>
+                <input type="date" min={minDate} value={expiryDate} onChange={(e) => { setExpiryDate(e.target.value); setError(""); }} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-sm font-bold focus:outline-none focus:border-[#004d40]" />
+              </div>
             </div>
 
-            {/* Expiry Date */}
-            <div>
-              <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">
-                Expiry Date
-              </label>
-              <input
-                type="date"
-                min={minDate}
-                value={expiryDate}
-                onChange={(e) => { setExpiryDate(e.target.value); setError(""); }}
-                className="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl px-4 text-base font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#004d40]/30 focus:border-[#004d40]/50 transition"
-              />
+            <div className="h-px bg-slate-100 my-2" />
+
+            {/* Economics & Thresholds */}
+            <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Product Economics (Global)</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-black text-slate-500 block mb-1">Cost Price (₦)</label>
+                <input type="number" inputMode="numeric" placeholder="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
+              </div>
+              <div>
+                <label className="text-xs font-black text-slate-500 block mb-1">Selling Price (₦)</label>
+                <input type="number" inputMode="numeric" placeholder="0" value={sellingPrice} onChange={(e) => setSellingPrice(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              <div>
+                <label className="text-xs font-black text-slate-500 block mb-1">Reorder Point</label>
+                <input type="number" inputMode="numeric" placeholder="10" value={reorderPoint} onChange={(e) => setReorderPoint(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
+              </div>
+              <div>
+                <label className="text-xs font-black text-slate-500 block mb-1">Daily Usage (Avg)</label>
+                <input type="number" inputMode="numeric" placeholder="1" value={avgDailyUsage} onChange={(e) => setAvgDailyUsage(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
+              </div>
             </div>
 
-            {error && (
-              <p className="text-red-500 text-sm font-semibold">{error}</p>
-            )}
+            {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
 
-            <button
-              onClick={handleSave}
-              className="w-full h-14 bg-[#004d40] text-white rounded-2xl font-bold text-base mt-2 shadow-lg shadow-[#004d40]/20 active:scale-[0.98] transition-transform"
-            >
+            <button onClick={handleSave} className="w-full h-14 bg-[#004d40] text-white rounded-2xl font-bold text-base mt-2 shadow-lg shadow-[#004d40]/20 active:scale-[0.98] transition-transform">
               Save Batch
             </button>
           </div>
         </div>
-        {/* Safe area spacer */}
         <div className="h-6" />
       </motion.div>
     </>

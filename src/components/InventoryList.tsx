@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Package, Calendar, ShoppingCart, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ interface InventoryListProps {
 export default function InventoryList({ items, onAddNew, onBack, onRefresh }: InventoryListProps) {
   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
+  const now = useMemo(() => Date.now(), []);
 
   const filtered = search.trim()
     ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.drug_reg_no.includes(search))
@@ -28,10 +29,16 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
     low_stock: { label: "Low Stock", labelClass: "bg-amber-50 text-amber-600 border-amber-100" },
   };
 
+  // Compute summary totals
+  const totalCost = filtered.reduce((sum, item) => sum + (item.total_quantity * (item.cost_price || 0)), 0);
+  const totalRetail = filtered.reduce((sum, item) => sum + (item.total_quantity * (item.selling_price || 0)), 0);
+  const potentialProfit = totalRetail - totalCost;
+  const alertsCount = filtered.filter(i => i.status !== 'healthy').length;
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-4 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-6 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-4 mb-4">
           <button
             onClick={onBack}
@@ -41,9 +48,26 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
           </button>
           <div>
             <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Active Stock</h1>
-            <p className="text-slate-400 text-xs font-medium">{items.length} drug{items.length !== 1 ? "s" : ""} in inventory</p>
+            <p className="text-slate-400 text-xs font-medium">{items.length} product{items.length !== 1 ? "s" : ""} tracked</p>
           </div>
         </div>
+
+        {/* Global Summary Row */}
+        <div className="flex gap-3 mb-5 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2 snap-x">
+          <div className="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
+            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Total Value (Cost)</span>
+            <p className="text-base font-black text-slate-800 mt-0.5">₦{totalCost.toLocaleString()}</p>
+          </div>
+          <div className="bg-green-50 border border-green-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
+            <span className="text-[9px] uppercase font-black text-[#2e7d32] tracking-wider">Potential Profit</span>
+            <p className="text-base font-black text-[#2e7d32] mt-0.5">₦{potentialProfit.toLocaleString()}</p>
+          </div>
+          <div className="bg-amber-50 border border-amber-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
+            <span className="text-[9px] uppercase font-black text-amber-600 tracking-wider">Action Needed</span>
+            <p className="text-base font-black text-amber-600 mt-0.5">{alertsCount} flagged</p>
+          </div>
+        </div>
+
         {/* Search */}
         <div className="relative">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
@@ -83,55 +107,101 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
               const d = new Date(item.nearest_expiry);
               if (!isNaN(d.getTime())) {
                 isValidDate = true;
-                daysToExpiry = Math.floor((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                daysToExpiry = Math.floor((d.getTime() - now) / (1000 * 60 * 60 * 24));
               }
             }
+
+            const cost = item.cost_price || 0;
+            const sell = item.selling_price || 0;
+            const reorderPt = item.reorder_point || 10;
+            const avgUsage = item.avg_daily_usage || 1;
+            
+            const margin = sell > 0 ? (((sell - cost) / sell) * 100).toFixed(0) : "0";
+            const valCost = cost * item.total_quantity;
+            const valProfit = (sell - cost) * item.total_quantity;
+            const daysOfSupply = Math.floor(item.total_quantity / avgUsage);
+            
+            const stockPercent = Math.min(100, Math.max(0, (item.total_quantity / (reorderPt * 2)) * 100));
+            const progressColor = item.total_quantity <= reorderPt ? "bg-amber-500" : "bg-[#2e7d32]";
 
             return (
               <motion.div
                 key={item.drug_id}
                 layout
-                className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden"
+                className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden"
               >
                 <div className="p-5">
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between mb-4">
                     <div className="flex-1 mr-4">
-                      <h3 className="font-extrabold text-slate-800 text-base leading-tight">{item.drug_name}</h3>
-                      <span className="text-[11px] font-mono font-bold text-slate-400 uppercase">{item.drug_reg_no}</span>
+                      <h3 className="font-extrabold text-slate-800 text-lg leading-tight mb-1">{item.drug_name}</h3>
+                      <span className="text-[10px] font-mono font-bold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded-md">{item.drug_reg_no}</span>
                     </div>
-                    {item.status !== "healthy" && (
-                      <span className={cn("text-[10px] font-black px-2.5 py-1 rounded-full border uppercase tracking-wider whitespace-nowrap", cfg.labelClass)}>
-                        {cfg.label}
+                    {(item.status !== "healthy" || daysOfSupply <= 14) && (
+                      <span className={cn("text-[9px] font-black px-2.5 py-1 rounded-full border uppercase tracking-wider whitespace-nowrap", cfg.labelClass || "bg-blue-50 text-blue-600 border-blue-100")}>
+                        {cfg.label || `${daysOfSupply}d supply`}
                       </span>
                     )}
                   </div>
 
-                  <div className="flex gap-6">
+                  {/* Stock Bar */}
+                  <div className="mb-5 bg-slate-50 p-4 rounded-[16px] border border-slate-100">
+                    <div className="flex justify-between items-end mb-2">
+                      <div>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-0.5 border-b-2 w-8 border-transparent">Units</span>
+                        <p className="text-2xl font-black text-slate-800 leading-none">{item.total_quantity}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase block">Reorder at {reorderPt}</span>
+                        <span className="text-xs font-bold text-slate-500">{daysOfSupply} days left</span>
+                      </div>
+                    </div>
+                    {/* Visual Progress */}
+                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden mt-2">
+                       <motion.div 
+                         initial={{ width: 0 }} 
+                         animate={{ width: `${stockPercent}%` }} 
+                         className={cn("h-full rounded-full transition-colors duration-500", progressColor)}
+                       />
+                    </div>
+                  </div>
+
+                  {/* Economics Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Est. Revenue</span>
+                      <p className="text-sm font-black text-slate-700">₦{valCost.toLocaleString()} → ₦{(valCost + valProfit).toLocaleString()}</p>
+                    </div>
+                    <div className="bg-green-50/50 p-3 rounded-xl border border-green-50">
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-[9px] font-bold text-[#2e7d32]/70 uppercase tracking-wider block">Margin</span>
+                        <span className="text-[10px] font-black text-[#2e7d32]">{margin}%</span>
+                      </div>
+                      <p className="text-sm font-black text-[#2e7d32]">+ ₦{valProfit.toLocaleString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Qty</span>
-                      <p className="text-2xl font-black text-slate-800 leading-none">
-                        {item.total_quantity} <span className="text-xs text-slate-400 font-bold">units</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Pricing</span>
+                      <p className="text-xs font-bold text-slate-600">
+                         Cost ₦{cost.toLocaleString()} <span className="text-slate-300">|</span> Sell ₦{sell.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Nearest Expiry</span>
-                      <p className={cn("text-base font-bold flex items-center gap-1", item.status === "expiring" ? "text-red-600" : "text-slate-600")}>
-                        <Calendar size={13} />
-                        {isValidDate ? (daysToExpiry <= 0 ? "Expired" : daysToExpiry === 1 ? "Tomorrow" : daysToExpiry <= 30 ? `${daysToExpiry}d left` : new Date(item.nearest_expiry).toLocaleDateString(undefined, { month: "short", year: "numeric" })) : "Unknown Date"}
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Expiry</span>
+                      <p className={cn("text-xs font-bold flex items-center gap-1", item.status === "expiring" ? "text-red-600" : "text-slate-600")}>
+                        <Calendar size={11} />
+                        {isValidDate ? (daysToExpiry <= 0 ? "Expired" : daysToExpiry === 1 ? "Tomorrow" : daysToExpiry <= 30 ? `${daysToExpiry}d left` : new Date(item.nearest_expiry).toLocaleDateString(undefined, { month: "short", year: "numeric" })) : "Unknown"}
                       </p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Batches</span>
-                      <p className="text-base font-bold text-slate-600">{item.batches.length}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Sell action */}
-                <div className="border-t border-slate-50 px-5 py-3">
+                <div className="border-t border-slate-100 bg-slate-50/30 px-5 py-3">
                   <button
                     onClick={() => setSellTarget(item)}
-                    className="w-full h-11 bg-[#004d40]/8 text-[#004d40] font-bold rounded-xl flex items-center justify-center gap-2 text-sm active:bg-[#004d40]/15 transition-colors"
+                    className="w-full h-12 bg-white border border-slate-200 text-[#004d40] font-black rounded-xl flex items-center justify-center gap-2 active:bg-slate-50 transition-colors shadow-sm"
                   >
                     <ShoppingCart size={16} />
                     Quick Sell

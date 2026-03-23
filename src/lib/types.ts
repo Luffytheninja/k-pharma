@@ -11,6 +11,12 @@ export interface Drug {
   oncology_notes?: string;
   status: "verified" | "caution" | "not_found";
   cached_at?: string;
+  
+  // Retail
+  cost_price?: number;
+  selling_price?: number;
+  reorder_point?: number;
+  avg_daily_usage?: number;
 }
 
 export interface InventoryBatch {
@@ -49,4 +55,10 @@ export interface InventoryItem {
   nearest_expiry: string;
   batches: InventoryBatch[];
   status: "healthy" | "expiring" | "low_stock";
+  
+  // Expanded for retail views
+  cost_price?: number;
+  selling_price?: number;
+  reorder_point?: number;
+  avg_daily_usage?: number;
 }

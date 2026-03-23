@@ -175,6 +175,7 @@ export function getInventoryItems(): InventoryItem[] {
   const batches = getBatches();
   const threshold = getLowStockThreshold();
   const grouped: Map<string, InventoryBatch[]> = new Map();
+  const drugCache = getCachedDrugAll();
 
   for (const batch of batches) {
     if (!batch || !batch.drug_id) continue;
@@ -194,9 +195,12 @@ export function getInventoryItems(): InventoryItem[] {
       (new Date(nearestExpiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
     );
 
+    const cachedDrug = drugCache.find((d) => d.nafdac_number === drug_id);
+    const reorderLevel = cachedDrug?.reorder_point ?? threshold;
+
     let status: InventoryItem["status"] = "healthy";
     if (daysToExpiry <= 30) status = "expiring";
-    else if (totalQty <= threshold) status = "low_stock";
+    else if (totalQty <= reorderLevel) status = "low_stock";
 
     items.push({
       drug_id,
@@ -206,6 +210,11 @@ export function getInventoryItems(): InventoryItem[] {
       nearest_expiry: nearestExpiry,
       batches: sortedBatches,
       status,
+      // Attached retail mechanics
+      cost_price: cachedDrug?.cost_price,
+      selling_price: cachedDrug?.selling_price,
+      reorder_point: reorderLevel,
+      avg_daily_usage: cachedDrug?.avg_daily_usage,
     });
   }
 

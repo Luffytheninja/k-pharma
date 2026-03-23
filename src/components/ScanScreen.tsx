@@ -32,7 +32,7 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
           <ArrowLeft size={22} />
         </button>
         <div className="text-center">
-          <h2 className="text-white font-black text-lg leading-none">Verify Drug</h2>
+          <h2 className="text-white font-black text-lg leading-none">Verify Product</h2>
           <p className="text-white/40 text-[11px] font-bold uppercase tracking-widest mt-0.5">
             {inputMode === "scan" ? "Scan Barcode" : "Manual Entry"}
           </p>

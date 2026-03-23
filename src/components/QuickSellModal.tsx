@@ -94,9 +94,14 @@ export default function QuickSellModal({ item, onClose, onSold }: QuickSellModal
 
               <div className="flex flex-col gap-4">
                 <div>
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">
-                    Quantity to Sell
-                  </label>
+                  <div className="flex justify-between items-end mb-2">
+                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider block">
+                      Quantity to Sell
+                    </label>
+                    <span className="text-xs font-bold text-[#2e7d32]">
+                      {item.selling_price ? `₦${item.selling_price.toLocaleString()} each` : "No price set"}
+                    </span>
+                  </div>
                   <input
                     type="number"
                     inputMode="numeric"
@@ -120,7 +125,9 @@ export default function QuickSellModal({ item, onClose, onSold }: QuickSellModal
                   className="w-full h-14 bg-[#004d40] text-white rounded-2xl font-bold text-base shadow-lg shadow-[#004d40]/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
                 >
                   <ShoppingCart size={20} />
-                  Sell — Deduct FIFO
+                  {item.selling_price && parseInt(quantity, 10) > 0 
+                    ? `Charge ₦${(parseInt(quantity, 10) * item.selling_price).toLocaleString()}` 
+                    : "Deduct FIFO"}
                 </button>
               </div>
             </>

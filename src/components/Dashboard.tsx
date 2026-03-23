@@ -57,7 +57,7 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, alertCount 
             <Search size={28} strokeWidth={2.5} />
           </div>
           <div>
-            <h2 className="text-2xl font-black tracking-tight leading-none">Verify Drug</h2>
+            <h2 className="text-2xl font-black tracking-tight leading-none">Verify Product</h2>
             <p className="text-white/50 text-sm mt-1 font-medium">Scan barcode or enter NAFDAC No.</p>
           </div>
         </motion.button>
@@ -103,7 +103,7 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, alertCount 
         {/* Motivational strip */}
         <div className="mt-auto pt-6">
           <p className="text-slate-400 text-xs text-center font-medium leading-relaxed italic px-6">
-            "Precision in dispensing is the first act of care."
+            &quot;Precision in dispensing is the first act of care.&quot;
           </p>
         </div>
       </div>
