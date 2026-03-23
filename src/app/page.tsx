@@ -42,6 +42,8 @@ export default function Home() {
   // DEEP DEBUG NET
   const [globalError, setGlobalError] = useState("");
 
+  const [authMode, setAuthMode] = useState<"login" | "update_password" | undefined>(undefined);
+
   useEffect(() => {
     setMounted(true);
     
@@ -50,8 +52,11 @@ export default function Home() {
       setIsAuthed(!!session);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthed(!!session);
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthMode("update_password");
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -130,7 +135,9 @@ export default function Home() {
   if (!mounted) return null;
 
   if (isAuthed === null) return null; // Still checking session
-  if (isAuthed === false) return <AuthScreen onSuccess={() => setIsAuthed(true)} />;
+  if (isAuthed === false || authMode === "update_password") {
+    return <AuthScreen initialMode={authMode} onSuccess={() => { setIsAuthed(true); setAuthMode(undefined); }} />;
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#f8f9fa]">

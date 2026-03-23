@@ -7,34 +7,45 @@ import { supabase } from "@/lib/supabase";
 
 interface AuthScreenProps {
   onSuccess: () => void;
+  initialMode?: "login" | "signup" | "onboarding" | "forgot" | "update_password";
 }
 
-export default function AuthScreen({ onSuccess }: AuthScreenProps) {
-  const [mode, setMode] = useState<"login" | "signup" | "onboarding">("login");
+export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScreenProps) {
+  const [mode, setMode] = useState<"login" | "signup" | "onboarding" | "forgot" | "update_password">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pharmacyName, setPharmacyName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleAuth = async () => {
     setLoading(true);
     setError("");
+    setSuccessMsg("");
     try {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         await checkOnboarding();
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin,
+        });
+        if (error) throw error;
+        setSuccessMsg("Reset link sent! Please check your email inbox.");
+      } else if (mode === "update_password") {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+        setSuccessMsg("Password updated successfully! You can now log in.");
+        setMode("login");
       } else {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        
-        // If Supabase is configured to not auto-login (e.g. email confirm required)
         if (!data.session) {
-          setError("Account created! Please check your email to verify before logging in.");
+          setSuccessMsg("Account created! Please verify your email before logging in.");
           return;
         }
-        
         setMode("onboarding");
       }
     } catch (e: any) {
@@ -82,7 +93,6 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
         throw new Error("Session expired. Please log in again.");
       }
 
-      // Check if pharmacy already exists for this user (prevent duplicates)
       const { data: existing } = await supabase
         .from("pharmacies")
         .select("id")
@@ -102,7 +112,6 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
 
       if (pErr) throw pErr;
 
-      // Create initial branch
       const { error: bErr } = await supabase.from("branches").insert([{ 
         pharmacy_id: pharmacy.id, 
         name: "Main Branch" 
@@ -131,11 +140,12 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
         </motion.div>
 
         <h1 className="text-3xl font-black text-slate-800 text-center tracking-tight mb-2 uppercase">
-          {mode === "onboarding" ? "Register Store" : "K-Pharma"}
+          {mode === "onboarding" ? "Register Store" : mode === "forgot" ? "Reset Access" : mode === "update_password" ? "New Password" : "K-Pharma"}
         </h1>
         <p className="text-center text-sm font-medium text-slate-400 mb-8 px-4">
-          {mode === "onboarding" 
-            ? "Welcome! Name your pharmacy to start your first branch." 
+          {mode === "onboarding" ? "Welcome! Name your pharmacy." 
+            : mode === "forgot" ? "We'll send you a secure link to your admin email." 
+            : mode === "update_password" ? "Secure your account with a fresh password."
             : mode === "login" ? "Enter your admin credentials" : "Create a new pharmacy account"}
         </p>
 
@@ -147,7 +157,7 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
                   <Store className="absolute left-4 top-4 text-slate-400" size={20} />
                   <input
                     type="text"
-                    placeholder="Pharmacy Name (e.g. K-Pharma Lagos)"
+                    placeholder="Pharmacy Name"
                     value={pharmacyName}
                     onChange={(e) => setPharmacyName(e.target.value)}
                     className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#004d40]/20 outline-none transition-all"
@@ -163,19 +173,32 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
                     placeholder="Admin Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#004d40]/20 outline-none transition-all"
+                    disabled={mode === "update_password"}
+                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#004d40]/20 outline-none transition-all disabled:opacity-50"
                   />
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-4 text-slate-400" size={20} />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#004d40]/20 outline-none transition-all"
-                  />
-                </div>
+                {mode !== "forgot" && (
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-4 text-slate-400" size={20} />
+                    <input
+                      type="password"
+                      placeholder={mode === "update_password" ? "New Password" : "Password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#004d40]/20 outline-none transition-all"
+                    />
+                  </div>
+                )}
+                {mode === "login" && (
+                  <div className="text-right px-1">
+                    <button 
+                      onClick={() => { setMode("forgot"); setError(""); setSuccessMsg(""); }}
+                      className="text-xs font-bold text-[#004d40]/60 hover:text-[#004d40]"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -187,6 +210,13 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
             </div>
           )}
 
+          {successMsg && (
+            <div className="flex items-center gap-2 text-green-600 text-xs font-bold bg-green-50 p-4 rounded-xl">
+              <Shield size={14} />
+              {successMsg}
+            </div>
+          )}
+
           <button
             onClick={mode === "onboarding" ? handleRegisterStore : handleAuth}
             disabled={loading}
@@ -194,19 +224,29 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
           >
             {loading ? <Loader2 size={24} className="animate-spin" /> : (
               <>
-                {mode === "login" ? "Sign In" : mode === "signup" ? "Get Started" : "Launch Store"}
+                {mode === "login" ? "Sign In" : mode === "signup" ? "Get Started" : mode === "forgot" ? "Send Reset Link" : "Update Password"}
                 <ArrowRight size={20} />
               </>
             )}
           </button>
 
-          {mode !== "onboarding" && (
-            <button
-              onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}
-              className="w-full py-2 text-sm font-bold text-slate-500 hover:text-[#004d40] transition-colors"
-            >
-              {mode === "login" ? "Need a pharmacy account? Sign Up" : "Already have an account? Log In"}
-            </button>
+          {mode !== "onboarding" && mode !== "update_password" && (
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSuccessMsg(""); }}
+                className="w-full py-2 text-sm font-bold text-slate-500 hover:text-[#004d40] transition-colors"
+              >
+                {mode === "login" ? "Need a pharmacy account? Sign Up" : "Already have an account? Log In"}
+              </button>
+              {mode === "forgot" && (
+                <button
+                  onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); }}
+                  className="w-full py-2 text-xs font-black text-[#004d40] uppercase tracking-wider"
+                >
+                  ← Back to Login
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
