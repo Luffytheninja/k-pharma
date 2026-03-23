@@ -1,17 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Package, Bell, Wifi, WifiOff } from "lucide-react";
+import { Search, Package, Bell, Wifi, WifiOff, History, ArrowRight } from "lucide-react";
 import { useOnlineStatus } from "@/lib/hooks";
 
 interface DashboardProps {
   onVerify: () => void;
   onInventory: () => void;
   onAlerts: () => void;
+  onLogs: () => void;
   alertCount?: number;
 }
 
-export default function Dashboard({ onVerify, onInventory, onAlerts, alertCount = 0 }: DashboardProps) {
+export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, alertCount = 0 }: DashboardProps) {
   const isOnline = useOnlineStatus();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
@@ -100,12 +101,23 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, alertCount 
           </motion.button>
         </div>
 
-        {/* Motivational strip */}
-        <div className="mt-auto pt-6">
-          <p className="text-slate-400 text-xs text-center font-medium leading-relaxed italic px-6">
-            &quot;Precision in dispensing is the first act of care.&quot;
-          </p>
-        </div>
+        {/* LOGS BUTTON - PRIORITY UTILITY */}
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={onLogs}
+          className="w-full bg-slate-800 text-white rounded-[24px] p-5 flex items-center justify-between shadow-lg shadow-slate-800/10 mt-2"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+              <History size={20} />
+            </div>
+            <div className="text-left">
+              <h3 className="text-sm font-black text-white leading-none">Activity Log</h3>
+              <p className="text-white/40 text-[10px] mt-1 font-bold uppercase tracking-wider">Audit Trail &amp; Financials</p>
+            </div>
+          </div>
+          <ArrowRight size={18} className="text-white/30" />
+        </motion.button>
       </div>
     </div>
   );

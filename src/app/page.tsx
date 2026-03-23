@@ -2,28 +2,31 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import PinScreen from "@/components/PinScreen";
+import AuthScreen from "@/components/AuthScreen";
 import Dashboard from "@/components/Dashboard";
 import ScanScreen from "@/components/ScanScreen";
 import VerifiedResult from "@/components/VerifiedResult";
 import InventoryList from "@/components/InventoryList";
 import AlertsScreen from "@/components/AlertsScreen";
+import ActivityLog from "@/components/ActivityLog";
 import AddToStockModal from "@/components/AddToStockModal"; // Ensure import is present
 import { Drug, InventoryItem } from "@/lib/types";
-import { getStoredPin, getInventoryItems, getCachedDrug, cacheDrug } from "@/lib/store";
+import { getInventoryItems, getCachedDrug, cacheDrug } from "@/lib/store";
 import { useOnlineStatus } from "@/lib/hooks";
+import { supabase } from "@/lib/supabase";
 
-type View = "dashboard" | "verify" | "inventory" | "alerts";
+type View = "dashboard" | "verify" | "inventory" | "alerts" | "logs";
 
 const TRANSITIONS: Record<View, { initial: object; exit: object }> = {
   dashboard: { initial: { opacity: 0 }, exit: { opacity: 0 } },
   verify: { initial: { x: "100%" }, exit: { x: "100%" } },
   inventory: { initial: { y: "100%" }, exit: { y: "100%" } },
   alerts: { initial: { y: "100%" }, exit: { y: "100%" } },
+  logs: { initial: { y: "100%" }, exit: { y: "100%" } },
 };
 
 export default function Home() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null); // null = checking, false = show auth
   const [view, setView] = useState<View>("dashboard");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState("");
@@ -42,15 +45,16 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     
-    // Catch silent errors and display them
-    const handleErr = (e: ErrorEvent) => setGlobalError(e.message);
-    const handleRej = (e: PromiseRejectionEvent) => setGlobalError(String(e.reason));
-    window.addEventListener("error", handleErr);
-    window.addEventListener("unhandledrejection", handleRej);
-    return () => {
-      window.removeEventListener("error", handleErr);
-      window.removeEventListener("unhandledrejection", handleRej);
-    };
+    // Auth Listener
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthed(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthed(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const refreshInventory = useCallback(() => {
@@ -58,7 +62,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isAuthed) refreshInventory();
+    if (isAuthed === true) refreshInventory();
   }, [isAuthed, refreshInventory]);
 
   const handleVerify = async (regNo: string) => {
@@ -125,9 +129,8 @@ export default function Home() {
 
   if (!mounted) return null;
 
-  if (!isAuthed) {
-    return <PinScreen onSuccess={() => setIsAuthed(true)} />;
-  }
+  if (isAuthed === null) return null; // Still checking session
+  if (isAuthed === false) return <AuthScreen onSuccess={() => setIsAuthed(true)} />;
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#f8f9fa]">
@@ -145,8 +148,22 @@ export default function Home() {
               onVerify={() => setView("verify")}
               onInventory={() => { refreshInventory(); setView("inventory"); }}
               onAlerts={() => { refreshInventory(); setView("alerts"); }}
+              onLogs={() => { refreshInventory(); setView("logs"); }}
               alertCount={alertCount}
             />
+          </motion.div>
+        )}
+
+        {view === "logs" && (
+          <motion.div
+            key="logs"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 28, stiffness: 260 }}
+            className="absolute inset-0 overflow-y-auto"
+          >
+            <ActivityLog onBack={() => setView("dashboard")} />
           </motion.div>
         )}
 

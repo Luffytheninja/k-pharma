@@ -33,8 +33,26 @@ export interface Transaction {
   id: string;
   inventory_id: string;
   drug_name: string;
-  quantity_sold: number;
+  quantity: number; // Positive for restock, negative for sale
+  type: "sale" | "restock" | "adjustment";
+  cost_price?: number;
+  selling_price?: number;
+  margin?: number;
   sold_at: string;
+}
+
+export interface Pharmacy {
+  id: string;
+  name: string;
+  owner_id: string; // Supabase UID
+  created_at: string;
+}
+
+export interface Branch {
+  id: string;
+  pharmacy_id: string;
+  name: string;
+  location?: string;
 }
 
 export interface Alert {

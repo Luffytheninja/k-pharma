@@ -63,12 +63,26 @@ export function saveBatches(batches: InventoryBatch[]) {
 
 export function addBatch(batch: Omit<InventoryBatch, "id" | "added_at">): InventoryBatch {
   const batches = getBatches();
+  const cachedDrug = getCachedDrug(batch.drug_id);
+  
   const newBatch: InventoryBatch = {
     ...batch,
     id: generateId(),
     added_at: new Date().toISOString(),
   };
   saveBatches([...batches, newBatch]);
+
+  // Log as Restock
+  logTransaction({
+    inventory_id: newBatch.id,
+    drug_name: batch.drug_name,
+    quantity: batch.quantity,
+    type: "restock",
+    cost_price: cachedDrug?.cost_price,
+    selling_price: cachedDrug?.selling_price,
+    margin: cachedDrug?.selling_price && cachedDrug?.cost_price ? ((cachedDrug.selling_price - cachedDrug.cost_price) / cachedDrug.selling_price) * 100 : 0
+  });
+
   syncToCloud().catch(() => {}); // Optimistic sync attempt
   return newBatch;
 }
@@ -92,7 +106,18 @@ export function sellFromInventory(drug_id: string, quantity: number): { success:
   });
 
   saveBatches(updatedBatches.filter((b) => b.quantity > 0)); // remove zero-quantity batches
-  logTransaction(drug_id, drugBatches[0]?.id ?? "", drugBatches[0]?.drug_name ?? "", quantity);
+  
+  const cachedDrug = getCachedDrug(drug_id);
+  logTransaction({
+    inventory_id: drugBatches[0]?.id ?? "",
+    drug_name: drugBatches[0]?.drug_name ?? "",
+    quantity: -quantity, // Negative for sale
+    type: "sale",
+    cost_price: cachedDrug?.cost_price,
+    selling_price: cachedDrug?.selling_price,
+    margin: cachedDrug?.selling_price && cachedDrug?.cost_price ? ((cachedDrug.selling_price - cachedDrug.cost_price) / cachedDrug.selling_price) * 100 : 0
+  });
+
   syncToCloud().catch(() => {}); // Optimistic sync attempt
   return { success: true, remaining: totalAvailable - quantity };
 }
@@ -110,16 +135,14 @@ export function getTransactions(): Transaction[] {
   }
 }
 
-function logTransaction(drug_id: string, inventory_id: string, drug_name: string, quantity_sold: number) {
+export function logTransaction(data: Omit<Transaction, "id" | "sold_at">) {
   const tx: Transaction = {
+    ...data,
     id: generateId(),
-    inventory_id,
-    drug_name,
-    quantity_sold,
     sold_at: new Date().toISOString(),
   };
   const txs = getTransactions();
-  localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify([...txs, tx]));
+  localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify([tx, ...txs]));
 }
 
 // ─── DRUG CACHE ───────────────────────────────────────
@@ -167,7 +190,11 @@ export function getLowStockThreshold(): number {
   const raw = localStorage.getItem(KEYS.LOW_STOCK_THRESHOLD);
   return raw ? parseInt(raw, 10) : 10;
 }
-
+export function purgeAllAppData() {
+  if (typeof window === "undefined") return;
+  Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
+  window.location.reload();
+}
 // ─── DERIVED INVENTORY VIEW ───────────────────────────
 import { InventoryItem } from "./types";
 
