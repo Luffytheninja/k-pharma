@@ -130,8 +130,8 @@ export default function Home() {
       // Cache locally
       cacheDrug(drug);
       setVerifiedDrug(drug);
-    } catch (err: any) {
-      if (err.name === "AbortError") {
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === "AbortError") {
         setVerifyError("Taking longer than usual… Check your connection and try again.");
       } else if (!isOnline) {
         const cached = getCachedDrug(regNo);
@@ -167,7 +167,7 @@ export default function Home() {
   }
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#f8f9fa]">
+    <div className="fixed inset-0 overflow-hidden bg-trust-surface">
       <AnimatePresence mode="wait">
         {view === "dashboard" && (
           <motion.div

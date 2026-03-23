@@ -19,7 +19,7 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
   const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
-  const [now] = useState(() => Date.now()); // Stable render timestamp to avoid impure useMemo warning
+  const [now] = useState(() => Date.now());
 
   const filtered = search.trim()
     ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.drug_reg_no.includes(search))
@@ -27,8 +27,8 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
 
   const statusConfig = {
     healthy: { label: "", labelClass: "" },
-    expiring: { label: "Expiring Soon", labelClass: "bg-red-50 text-red-600 border-red-100" },
-    low_stock: { label: "Low Stock", labelClass: "bg-amber-50 text-amber-600 border-amber-100" },
+    expiring: { label: "Expiring Soon", labelClass: "badge-danger" },
+    low_stock: { label: "Low Stock", labelClass: "badge-warning" },
   };
 
   // Compute summary totals
@@ -38,65 +38,66 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
   const alertsCount = filtered.filter(i => i.status !== 'healthy').length;
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
+    <div className="flex flex-col min-h-screen bg-trust-surface">
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-6 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-4 mb-4">
+      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
+        <div className="flex items-center gap-4 mb-5">
           <button
             onClick={onBack}
-            className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500"
+            className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Active Stock</h1>
-            <p className="text-slate-400 text-xs font-medium">{items.length} product{items.length !== 1 ? "s" : ""} tracked</p>
+            <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Active Stock</h1>
+            <p className="text-trust-text-muted text-label font-medium mt-0.5">{items.length} product{items.length !== 1 ? "s" : ""} tracked</p>
           </div>
         </div>
 
-        {/* Global Summary Row */}
+        {/* Summary Row */}
         <div className="flex gap-3 mb-5 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2 snap-x">
-          <div className="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
-            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Total Value (Cost)</span>
-            <p className="text-base font-black text-slate-800 mt-0.5">₦{totalCost.toLocaleString()}</p>
+          <div className="card p-4 min-w-[130px] snap-start">
+            <span className="section-label block">Total Value (Cost)</span>
+            <p className="text-body font-bold text-trust-text mt-1">₦{totalCost.toLocaleString()}</p>
           </div>
-          <div className="bg-green-50 border border-green-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
-            <span className="text-[9px] uppercase font-black text-[#2e7d32] tracking-wider">Potential Profit</span>
-            <p className="text-base font-black text-[#2e7d32] mt-0.5">₦{potentialProfit.toLocaleString()}</p>
+          <div className="bg-success-light border border-success-border p-4 rounded-card min-w-[130px] snap-start">
+            <span className="section-label text-success block">Potential Profit</span>
+            <p className="text-body font-bold text-success mt-1">₦{potentialProfit.toLocaleString()}</p>
           </div>
-          <div className="bg-amber-50 border border-amber-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
-            <span className="text-[9px] uppercase font-black text-amber-600 tracking-wider">Action Needed</span>
-            <p className="text-base font-black text-amber-600 mt-0.5">{alertsCount} flagged</p>
+          <div className="bg-warning-light border border-warning-border p-4 rounded-card min-w-[130px] snap-start">
+            <span className="section-label text-warning block">Action Needed</span>
+            <p className="text-body font-bold text-warning mt-1">{alertsCount} flagged</p>
           </div>
         </div>
 
         {/* Search */}
-        <div className="relative">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+        <div className="input-icon">
+          <Search size={18} className="icon" />
           <input
             type="text"
             placeholder="Search by name or registration..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-12 bg-slate-50 rounded-xl pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20 border border-slate-100 placeholder:text-slate-300"
+            className="input-field"
+            style={{ paddingLeft: '48px', height: '48px' }}
           />
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-6 py-4 pb-28 space-y-3">
+      <div className="flex-1 px-7 py-5 pb-28 space-y-4">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-300">
-            <Package size={52} />
-            <p className="font-bold text-sm text-slate-400">
+          <div className="flex flex-col items-center justify-center h-64 gap-5 text-trust-text-faint">
+            <Package size={48} />
+            <p className="font-semibold text-label text-trust-text-muted">
               {search ? "No products match your search" : "No products in inventory yet"}
             </p>
             {!search && (
               <button
                 onClick={onAddNew}
-                className="mt-2 bg-[#0f172a] text-white text-sm font-bold px-6 py-3 rounded-xl"
+                className="btn-primary"
               >
-                Find &amp; Add First Item
+                Find & Add First Item
               </button>
             )}
           </div>
@@ -124,75 +125,75 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
             const daysOfSupply = Math.floor(item.total_quantity / avgUsage);
             
             const stockPercent = Math.min(100, Math.max(0, (item.total_quantity / (reorderPt * 2)) * 100));
-            const progressColor = item.total_quantity <= reorderPt ? "bg-amber-500" : "bg-[#2e7d32]";
+            const progressColor = item.total_quantity <= reorderPt ? "bg-warning" : "bg-success";
 
             return (
               <motion.div
                 key={item.drug_id}
                 layout
-                className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden"
+                className="card-premium overflow-hidden"
               >
-                <div className="p-5">
-                  <div className="flex items-start justify-between mb-4">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-5">
                     <div className="flex-1 mr-4">
-                      <h3 className="font-extrabold text-slate-800 text-lg leading-tight mb-1">{item.drug_name}</h3>
-                      <span className="text-[10px] font-mono font-bold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded-md">{item.drug_reg_no}</span>
+                      <h3 className="font-bold text-trust-text text-body-lg leading-tight mb-1.5">{item.drug_name}</h3>
+                      <span className="text-label-sm font-mono font-semibold text-trust-text-muted bg-trust-surface px-2.5 py-1 rounded-badge">{item.drug_reg_no}</span>
                     </div>
                     {(item.status !== "healthy" || daysOfSupply <= 14) && (
-                      <span className={cn("text-[9px] font-black px-2.5 py-1 rounded-full border uppercase tracking-wider whitespace-nowrap", cfg.labelClass || "bg-blue-50 text-blue-600 border-blue-100")}>
+                      <span className={cn("badge whitespace-nowrap", cfg.labelClass || "badge-neutral")}>
                         {cfg.label || `${daysOfSupply}d supply`}
                       </span>
                     )}
                   </div>
 
                   {/* Stock Bar */}
-                  <div className="mb-5 bg-slate-50 p-4 rounded-[16px] border border-slate-100">
-                    <div className="flex justify-between items-end mb-2">
+                  <div className="mb-5 bg-trust-surface p-5 rounded-card border border-trust-border-subtle">
+                    <div className="flex justify-between items-end mb-3">
                       <div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-0.5 border-b-2 w-8 border-transparent">Units</span>
-                        <p className="text-2xl font-black text-slate-800 leading-none">{item.total_quantity}</p>
+                        <span className="section-label block mb-1">Units</span>
+                        <p className="text-heading-lg font-bold text-trust-text leading-none">{item.total_quantity}</p>
                       </div>
                       <div className="text-right">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase block">Reorder at {reorderPt}</span>
-                        <span className="text-xs font-bold text-slate-500">{daysOfSupply} days left</span>
+                        <span className="section-label block mb-0.5">Reorder at {reorderPt}</span>
+                        <span className="text-label font-semibold text-trust-text-secondary">{daysOfSupply} days left</span>
                       </div>
                     </div>
-                    {/* Visual Progress */}
-                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden mt-2">
+                    <div className="h-2.5 w-full bg-trust-border rounded-full overflow-hidden mt-2">
                        <motion.div 
                          initial={{ width: 0 }} 
                          animate={{ width: `${stockPercent}%` }} 
-                         className={cn("h-full rounded-full transition-colors duration-500", progressColor)}
+                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                         className={cn("h-full rounded-full", progressColor)}
                        />
                     </div>
                   </div>
 
                   {/* Economics Grid */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Est. Revenue</span>
-                      <p className="text-sm font-black text-slate-700">₦{valCost.toLocaleString()} → ₦{(valCost + valProfit).toLocaleString()}</p>
+                  <div className="grid grid-cols-2 gap-4 mb-5">
+                    <div className="bg-trust-surface p-4 rounded-card border border-trust-border-subtle">
+                      <span className="section-label block mb-1">Est. Revenue</span>
+                      <p className="text-label font-bold text-trust-text">₦{valCost.toLocaleString()} → ₦{(valCost + valProfit).toLocaleString()}</p>
                     </div>
-                    <div className="bg-green-50/50 p-3 rounded-xl border border-green-50">
+                    <div className="bg-success-light p-4 rounded-card border border-success-border">
                       <div className="flex justify-between items-baseline">
-                        <span className="text-[9px] font-bold text-[#2e7d32]/70 uppercase tracking-wider block">Margin</span>
-                        <span className="text-[10px] font-black text-[#2e7d32]">{margin}%</span>
+                        <span className="section-label text-success block">Margin</span>
+                        <span className="text-label-sm font-bold text-success">{margin}%</span>
                       </div>
-                      <p className="text-sm font-black text-[#2e7d32]">+ ₦{valProfit.toLocaleString()}</p>
+                      <p className="text-label font-bold text-success mt-0.5">+ ₦{valProfit.toLocaleString()}</p>
                     </div>
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-6">
                     <div>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Pricing</span>
-                      <p className="text-xs font-bold text-slate-600">
-                         Cost ₦{cost.toLocaleString()} <span className="text-slate-300">|</span> Sell ₦{sell.toLocaleString()}
+                      <span className="section-label block mb-1">Pricing</span>
+                      <p className="text-label font-semibold text-trust-text-secondary">
+                         Cost ₦{cost.toLocaleString()} <span className="text-trust-text-faint">|</span> Sell ₦{sell.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Expiry</span>
-                      <p className={cn("text-xs font-bold flex items-center gap-1", item.status === "expiring" ? "text-red-600" : "text-slate-600")}>
-                        <Calendar size={11} />
+                      <span className="section-label block mb-1">Expiry</span>
+                      <p className={cn("text-label font-semibold flex items-center gap-1.5", item.status === "expiring" ? "text-danger" : "text-trust-text-secondary")}>
+                        <Calendar size={13} />
                         {isValidDate ? (daysToExpiry <= 0 ? "Expired" : daysToExpiry === 1 ? "Tomorrow" : daysToExpiry <= 30 ? `${daysToExpiry}d left` : new Date(item.nearest_expiry).toLocaleDateString(undefined, { month: "short", year: "numeric" })) : "Unknown"}
                       </p>
                     </div>
@@ -200,17 +201,17 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
                 </div>
 
                 {/* Actions */}
-                <div className="border-t border-slate-100 bg-slate-50/30 px-5 py-3 flex gap-2">
+                <div className="border-t border-trust-border-subtle bg-trust-surface/50 px-6 py-4 flex gap-3">
                   <button
                     onClick={() => setSellTarget(item)}
-                    className="flex-[2] h-12 bg-white border border-slate-200 text-[#004d40] font-black rounded-xl flex items-center justify-center gap-2 active:bg-slate-50 transition-colors shadow-sm"
+                    className="flex-[2] h-12 bg-white border border-trust-border text-brand font-bold rounded-button flex items-center justify-center gap-2 hover:border-brand/30 active:bg-brand-50 transition-all duration-200 shadow-card"
                   >
                     <ShoppingCart size={16} />
                     Quick Sell
                   </button>
                   <button
                     onClick={() => setAdjustTarget(item)}
-                    className="flex-1 h-12 bg-white border border-slate-100 text-slate-400 font-bold rounded-xl flex items-center justify-center gap-2 active:bg-red-50 transition-colors shadow-sm text-xs"
+                    className="flex-1 h-12 bg-white border border-trust-border-subtle text-trust-text-muted font-semibold rounded-button flex items-center justify-center gap-2 hover:border-warning/30 active:bg-warning-light transition-all duration-200 shadow-card text-label"
                   >
                     <AlertTriangle size={14} />
                     Adjust
@@ -222,13 +223,14 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
         )}
       </div>
 
-      {/* FAB — Verify + Add */}
-      <div className="fixed bottom-6 right-6">
+      {/* FAB */}
+      <div className="fixed bottom-7 right-7">
         <button
           onClick={onAddNew}
-          className="w-16 h-16 bg-[#004d40] text-white rounded-[22px] shadow-2xl shadow-[#004d40]/40 flex items-center justify-center active:scale-90 transition-transform"
+          className="w-16 h-16 bg-brand text-white rounded-[18px] shadow-elevated flex items-center justify-center active:scale-90 transition-transform duration-200 relative overflow-hidden"
         >
-          <Plus size={28} />
+          <div className="absolute inset-0 rounded-[18px] border border-metallic-light/20" />
+          <Plus size={28} className="relative z-10" />
         </button>
       </div>
 

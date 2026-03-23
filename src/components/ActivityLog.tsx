@@ -55,95 +55,96 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `k-pharma-log-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `ko-mart-log-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
+    <div className="flex flex-col min-h-screen bg-trust-surface">
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-6 sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
+            <button onClick={onBack} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Activity Log</h1>
-              <p className="text-slate-400 text-xs font-medium">Audit Trail &amp; Ledger</p>
+              <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Activity Log</h1>
+              <p className="text-trust-text-muted text-label font-medium mt-0.5">Audit Trail & Ledger</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={handleExport} className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#004d40]">
+            <button onClick={handleExport} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-brand hover:bg-brand-50 transition-colors duration-200">
               <Download size={20} />
             </button>
-            <button onClick={() => setShowConfirmReset(true)} className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
+            <button onClick={() => setShowConfirmReset(true)} className="w-11 h-11 bg-danger-light rounded-button flex items-center justify-center text-danger hover:bg-danger/10 transition-colors duration-200">
               <Trash2 size={20} />
             </button>
           </div>
         </div>
 
         {/* Quick Summary */}
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-2 px-2">
-          <div className="bg-[#004d40] text-white px-4 py-3 rounded-2xl min-w-[140px] shadow-lg shadow-[#004d40]/20">
-            <span className="text-[9px] uppercase font-black text-white/60 tracking-wider">Revenue (Logged)</span>
-            <p className="text-lg font-black mt-0.5">₦{stats.totalRevenue.toLocaleString()}</p>
+        <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-2 px-2 mb-5">
+          <div className="card-premium bg-brand text-white px-5 py-4 min-w-[150px] shadow-elevated" style={{ borderColor: 'transparent' }}>
+            <span className="section-label text-white/60 block">Revenue (Logged)</span>
+            <p className="text-body-lg font-bold mt-1">₦{stats.totalRevenue.toLocaleString()}</p>
           </div>
-          <div className="bg-white border border-slate-100 px-4 py-3 rounded-2xl min-w-[120px]">
-            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Total Sales</span>
-            <p className="text-lg font-black text-slate-800 mt-0.5">{stats.salesCount}</p>
+          <div className="card px-5 py-4 min-w-[130px]">
+            <span className="section-label block">Total Sales</span>
+            <p className="text-body-lg font-bold text-trust-text mt-1">{stats.salesCount}</p>
           </div>
-          <div className="bg-white border border-slate-100 px-4 py-3 rounded-2xl min-w-[120px]">
-            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Restocks</span>
-            <p className="text-lg font-black text-slate-800 mt-0.5">{stats.totalRestock}</p>
+          <div className="card px-5 py-4 min-w-[130px]">
+            <span className="section-label block">Restocks</span>
+            <p className="text-body-lg font-bold text-trust-text mt-1">{stats.totalRestock}</p>
           </div>
         </div>
 
-        <div className="mt-4 relative">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+        <div className="input-icon">
+          <Search size={18} className="icon" />
           <input
             type="text"
             placeholder="Search log..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 bg-slate-50 rounded-xl pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#004d40]/10 border border-slate-100"
+            className="input-field"
+            style={{ paddingLeft: '48px', height: '48px' }}
           />
         </div>
       </div>
 
       {/* List */}
-      <div className="flex-1 p-6 space-y-3">
+      <div className="flex-1 p-7 space-y-3">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-3 text-slate-300">
-            <History size={48} />
-            <p className="font-bold text-sm">No activity recorded yet</p>
+          <div className="flex flex-col items-center justify-center h-64 gap-4 text-trust-text-faint">
+            <History size={44} />
+            <p className="font-semibold text-label text-trust-text-muted">No activity recorded yet</p>
           </div>
         ) : (
           filtered.map((tx) => (
-            <div key={tx.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4">
+            <div key={tx.id} className="card p-5 flex items-center gap-4">
               <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                tx.type === "sale" ? "bg-green-50 text-green-600" : "bg-blue-50 text-blue-600"
+                "w-12 h-12 rounded-button flex items-center justify-center shrink-0",
+                tx.type === "sale" ? "bg-success-light text-success" : "bg-blue-50 text-blue-600"
               )}>
                 {tx.type === "sale" ? <TrendingDown size={22} /> : <TrendingUp size={22} />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
-                  <h4 className="font-black text-slate-800 text-sm truncate">{tx.drug_name}</h4>
+                  <h4 className="font-bold text-trust-text text-label truncate">{tx.drug_name}</h4>
                   <span className={cn(
-                    "text-[10px] font-black uppercase px-2 py-0.5 rounded-md",
-                    tx.type === "sale" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
+                    "badge ml-2",
+                    tx.type === "sale" ? "badge-success" : "badge-neutral"
                   )}>
                     {tx.type}
                   </span>
                 </div>
-                <div className="flex items-center justify-between mt-1">
-                  <p className="text-xs font-bold text-slate-500 tracking-tight">
+                <div className="flex items-center justify-between mt-1.5">
+                  <p className="text-label font-semibold text-trust-text-secondary tracking-tight">
                     {tx.quantity > 0 ? "+" : ""}{tx.quantity} units 
                     {tx.selling_price && ` · ₦${(Math.abs(tx.quantity)*tx.selling_price).toLocaleString()}`}
                   </p>
-                  <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold">
-                    <Calendar size={10} />
+                  <div className="flex items-center gap-1.5 text-label-sm text-trust-text-muted font-semibold">
+                    <Calendar size={12} />
                     {new Date(tx.sold_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -155,30 +156,31 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
 
       {/* Reset Confirmation */}
       {showConfirmReset && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-7">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
           <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-[32px] p-8 w-full max-w-sm relative z-10 text-center shadow-2xl"
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-white rounded-modal p-8 w-full max-w-sm relative z-10 text-center shadow-elevated"
           >
-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Trash2 size={32} />
+            <div className="w-16 h-16 bg-danger-light border border-danger-border text-danger rounded-card flex items-center justify-center mx-auto mb-6">
+              <Trash2 size={28} />
             </div>
-            <h3 className="text-xl font-black text-slate-800 mb-2 font-display">Factory Reset?</h3>
-            <p className="text-slate-500 text-sm font-medium mb-8">
+            <h3 className="text-heading-lg font-bold text-trust-text mb-3">Factory Reset?</h3>
+            <p className="text-trust-text-secondary text-label font-medium mb-8 leading-relaxed">
               This will permanently delete all inventory, logs, and settings. This cannot be undone.
             </p>
             <div className="flex flex-col gap-3">
               <button 
                 onClick={purgeAllAppData}
-                className="h-14 bg-red-500 text-white rounded-2xl font-black text-base shadow-lg shadow-red-500/30"
+                className="btn-danger w-full"
               >
                 CLEAR EVERYTHING
               </button>
               <button 
                 onClick={() => setShowConfirmReset(false)}
-                className="h-14 bg-slate-100 text-slate-500 rounded-2xl font-bold text-base"
+                className="btn-secondary w-full"
               >
                 Cancel
               </button>

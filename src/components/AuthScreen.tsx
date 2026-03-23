@@ -56,8 +56,9 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
         }
         setMode("onboarding");
       }
-    } catch (e: any) {
-      setError(e.message || "An authentication error occurred");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "An authentication error occurred";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -105,7 +106,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
         throw new Error("Session expired. Please log in again.");
       }
 
-      // 1. Sync Username to Auth Metadata
+      // Sync Username to Auth Metadata
       await supabase.auth.updateUser({
         data: { display_name: username }
       });
@@ -137,82 +138,111 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
       if (bErr) throw bErr;
 
       onSuccess();
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to register store. Check your internet connection.";
       console.error("Store Registration Error:", e);
-      setError(e.message || "Failed to register store. Check your internet connection.");
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  const headingText = () => {
+    switch (mode) {
+      case "onboarding": return "Set Up Store";
+      case "forgot": return "Reset Access";
+      case "update_password": return "New Password";
+      default: return "KO-Mart";
+    }
+  };
+
+  const subtitleText = () => {
+    switch (mode) {
+      case "onboarding": return "Welcome! Choose a name for your store.";
+      case "forgot": return "We'll send a secure reset link to your email.";
+      case "update_password": return "Secure your account with a fresh password.";
+      case "login": return "Sign in to your store account";
+      default: return "Create a new store account";
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-[#f8f9fa] flex flex-col items-center justify-center p-8 z-50 overflow-hidden">
+    <div className="fixed inset-0 bg-trust-surface flex flex-col items-center justify-center p-8 z-50 overflow-hidden">
       <div className="w-full max-w-sm">
+        {/* Logo */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.85, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-20 h-20 bg-[#0f172a] rounded-[28px] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-[#0f172a]/30"
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="w-18 h-18 bg-brand rounded-[20px] flex items-center justify-center mx-auto mb-8 shadow-elevated relative overflow-hidden"
         >
-          <Shield size={36} className="text-white" />
+          <div className="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent" />
+          <Shield size={32} className="text-white relative z-10" />
         </motion.div>
 
-        <h1 className="text-3xl font-black text-slate-800 text-center tracking-tight mb-2 uppercase">
-          {mode === "onboarding" ? "Register Store" : mode === "forgot" ? "Reset Access" : mode === "update_password" ? "New Password" : "KO-Mart"}
+        {/* Title */}
+        <h1 className="text-heading-xl font-bold text-trust-text text-center tracking-tight mb-2">
+          {headingText()}
         </h1>
-        <p className="text-center text-sm font-medium text-slate-400 mb-8 px-4">
-          {mode === "onboarding" ? "Welcome! Choose a name for your store." 
-            : mode === "forgot" ? "We'll send you a secure link to your admin email." 
-            : mode === "update_password" ? "Secure your account with a fresh password."
-            : mode === "login" ? "Enter your admin credentials" : "Create a new store account"}
+        <p className="text-center text-label font-medium text-trust-text-secondary mb-8 px-2">
+          {subtitleText()}
         </p>
 
         <div className="space-y-4">
           <AnimatePresence mode="wait">
             {mode === "onboarding" ? (
-              <motion.div key="onboarding" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
-                <div className="relative">
-                  <User className="absolute left-4 top-4 text-slate-400" size={20} />
+              <motion.div key="onboarding" initial={{ x: 16, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.2 }} className="space-y-4">
+                {/* Username */}
+                <div className="input-icon">
+                  <User className="icon" size={20} />
                   <input
                     type="text"
                     placeholder="Your Full Name / Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all"
+                    className="input-field"
+                    style={{ paddingLeft: '48px' }}
                   />
                 </div>
-                <div className="relative">
-                  <Store className="absolute left-4 top-4 text-slate-400" size={20} />
+                {/* Store Name */}
+                <div className="input-icon">
+                  <Store className="icon" size={20} />
                   <input
                     type="text"
                     placeholder="Store Name (e.g. KO-Mart Central)"
                     value={pharmacyName}
                     onChange={(e) => setPharmacyName(e.target.value)}
-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all"
+                    className="input-field"
+                    style={{ paddingLeft: '48px' }}
                   />
                 </div>
               </motion.div>
             ) : (
-              <motion.div key="auth" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
-                <div className="relative">
-                  <Mail className="absolute left-4 top-4 text-slate-400" size={20} />
+              <motion.div key="auth" initial={{ x: -16, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.2 }} className="space-y-4">
+                {/* Email */}
+                <div className="input-icon">
+                  <Mail className="icon" size={20} />
                   <input
                     type="email"
                     placeholder="Admin Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={mode === "update_password"}
-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all disabled:opacity-50"
+                    className="input-field"
+                    style={{ paddingLeft: '48px' }}
                   />
                 </div>
+                {/* Password */}
                 {mode !== "forgot" && (
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-4 text-slate-400" size={20} />
+                  <div className="input-icon">
+                    <Lock className="icon" size={20} />
                     <input
                       type="password"
                       placeholder={mode === "update_password" ? "New Password" : "Password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all"
+                      className="input-field"
+                      style={{ paddingLeft: '48px' }}
                     />
                   </div>
                 )}
@@ -220,7 +250,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
                   <div className="text-right px-1">
                     <button 
                       onClick={() => { setMode("forgot"); setError(""); setSuccessMsg(""); }}
-                      className="text-xs font-bold text-[#0f172a]/60 hover:text-[#0f172a]"
+                      className="text-label font-semibold text-trust-text-muted hover:text-brand transition-colors min-h-0"
                     >
                       Forgot Password?
                     </button>
@@ -230,45 +260,49 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
             )}
           </AnimatePresence>
 
+          {/* Error */}
           {error && (
-            <div className="flex items-center gap-2 text-red-500 text-xs font-bold bg-red-50 p-4 rounded-xl">
-              <AlertCircle size={14} />
+            <div className="flex items-center gap-3 text-danger text-label font-semibold bg-danger-light p-4 rounded-card border border-danger-border">
+              <AlertCircle size={16} className="shrink-0" />
               {error}
             </div>
           )}
 
+          {/* Success */}
           {successMsg && (
-            <div className="flex items-center gap-2 text-green-600 text-xs font-bold bg-green-50 p-4 rounded-xl">
-              <Shield size={14} />
+            <div className="flex items-center gap-3 text-success text-label font-semibold bg-success-light p-4 rounded-card border border-success-border">
+              <Shield size={16} className="shrink-0" />
               {successMsg}
             </div>
           )}
 
+          {/* Submit */}
           <button
             onClick={mode === "onboarding" ? handleRegisterStore : handleAuth}
             disabled={loading}
-            className="w-full h-14 bg-[#0f172a] text-white rounded-2xl font-black text-lg shadow-lg shadow-[#0f172a]/20 flex items-center justify-center gap-2 transform active:scale-[0.98] transition-all disabled:opacity-50"
+            className="btn-primary w-full"
           >
-            {loading ? <Loader2 size={24} className="animate-spin" /> : (
+            {loading ? <Loader2 size={22} className="animate-spin" /> : (
               <>
                 {mode === "login" ? "Sign In" : mode === "signup" ? "Get Started" : mode === "forgot" ? "Send Reset Link" : mode === "onboarding" ? "Finish Setup" : "Update Password"}
-                <ArrowRight size={20} />
+                <ArrowRight size={18} />
               </>
             )}
           </button>
 
+          {/* Mode Toggle */}
           {mode !== "onboarding" && mode !== "update_password" && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 pt-2">
               <button
                 onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSuccessMsg(""); }}
-                className="w-full py-2 text-sm font-bold text-slate-500 hover:text-[#0f172a] transition-colors"
+                className="btn-ghost w-full text-label"
               >
                 {mode === "login" ? "Need a store account? Sign Up" : "Already have an account? Log In"}
               </button>
               {mode === "forgot" && (
                 <button
                   onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); }}
-                  className="w-full py-2 text-xs font-black text-[#0f172a] uppercase tracking-wider"
+                  className="btn-ghost w-full text-label font-bold text-brand"
                 >
                   ← Back to Login
                 </button>

@@ -5,6 +5,7 @@ import { CheckCircle, AlertTriangle, XCircle, Plus, FlaskConical, Info } from "l
 import { cn } from "@/lib/utils";
 import { Drug } from "@/lib/types";
 import { getProMode } from "@/lib/store";
+
 interface VerifiedResultProps {
   drug: Drug;
   onClose: () => void;
@@ -16,31 +17,31 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
 
   const configs = {
     verified: {
-      bg: "bg-[#0f172a]",
-      light: "bg-slate-50 border-slate-100",
-      icon: <CheckCircle className="text-white" size={40} />,
+      bg: "bg-brand",
+      light: "bg-brand-50 border-brand-100",
+      icon: <CheckCircle className="text-white" size={36} />,
       header: "Verified",
       subtext: "Safe for retail sale",
-      textColor: "text-[#0f172a]",
-      badge: "bg-slate-100 text-[#0f172a]",
+      textColor: "text-brand",
+      badge: "badge-success",
     },
     caution: {
-      bg: "bg-[#ff8f00]",
-      light: "bg-amber-50 border-amber-100",
-      icon: <AlertTriangle className="text-white" size={40} />,
+      bg: "bg-warning",
+      light: "bg-warning-light border-warning-border",
+      icon: <AlertTriangle className="text-white" size={36} />,
       header: "Caution",
       subtext: "Verify supply chain before sale",
-      textColor: "text-[#ff8f00]",
-      badge: "bg-amber-100 text-[#ff8f00]",
+      textColor: "text-warning",
+      badge: "badge-warning",
     },
     not_found: {
-      bg: "bg-[#c62828]",
-      light: "bg-red-50 border-red-100",
-      icon: <XCircle className="text-white" size={40} />,
+      bg: "bg-danger",
+      light: "bg-danger-light border-danger-border",
+      icon: <XCircle className="text-white" size={36} />,
       header: "Not Verified",
       subtext: "Item not found in regulatory registry",
-      textColor: "text-[#c62828]",
-      badge: "bg-red-100 text-[#c62828]",
+      textColor: "text-danger",
+      badge: "badge-danger",
     },
   };
 
@@ -53,7 +54,7 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-end"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-end"
           onClick={onClose}
         />
       </AnimatePresence>
@@ -62,31 +63,32 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[36px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-modal shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto"
       >
         {/* Status strip */}
-        <div className={cn("p-8 flex flex-col items-center text-center", cfg.bg)}>
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4">
+        <div className={cn("p-8 flex flex-col items-center text-center relative", cfg.bg)}>
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-metallic-dark via-metallic-light to-metallic-dark opacity-40" />
+          <div className="w-18 h-18 bg-white/15 rounded-full flex items-center justify-center mb-5">
             {cfg.icon}
           </div>
-          <h2 className="text-4xl font-black text-white uppercase tracking-tight leading-none">{cfg.header}</h2>
-          <p className="text-white/70 text-sm mt-2 font-medium">{cfg.subtext}</p>
+          <h2 className="text-heading-xl font-bold text-white uppercase tracking-tight leading-none">{cfg.header}</h2>
+          <p className="text-white/65 text-label mt-2 font-medium">{cfg.subtext}</p>
         </div>
 
-        <div className="p-6 flex flex-col gap-4">
+        <div className="p-7 flex flex-col gap-5">
           {/* Product details card */}
           {drug.name && drug.name !== "Unknown Drug" && (
-            <div className={cn("rounded-2xl border p-5", cfg.light)}>
-              <h3 className="text-lg font-black text-slate-800">{drug.name}</h3>
-              <div className="grid grid-cols-2 gap-y-3 mt-3">
+            <div className={cn("card p-5", cfg.light)}>
+              <h3 className="text-heading-md font-bold text-trust-text">{drug.name}</h3>
+              <div className="grid grid-cols-2 gap-y-4 mt-4">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ID / Registration</span>
-                  <span className="text-sm font-mono font-bold text-slate-700">{drug.nafdac_number}</span>
+                  <span className="section-label block mb-1">ID / Registration</span>
+                  <span className="text-label font-mono font-bold text-trust-text-secondary">{drug.nafdac_number}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Manufacturer</span>
-                  <span className="text-sm font-bold text-slate-700 text-right block">{drug.manufacturer}</span>
+                  <span className="section-label block mb-1">Manufacturer</span>
+                  <span className="text-label font-bold text-trust-text-secondary text-right block">{drug.manufacturer}</span>
                 </div>
               </div>
             </div>
@@ -94,41 +96,41 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
 
           {/* Professional Mode extras */}
           {proMode && drug.status !== "not_found" && (drug.composition || drug.drug_class || drug.oncology_notes) && (
-            <div className="bg-slate-50 rounded-2xl border border-slate-100 p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <FlaskConical size={16} className="text-[#0f172a]" />
-                <span className="text-xs font-black text-[#0f172a] uppercase tracking-wider">Product Deep-Scan</span>
+            <div className="card p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <FlaskConical size={16} className="text-brand" />
+                <span className="section-label text-brand">Product Deep-Scan</span>
               </div>
               {drug.composition && (
-                <div className="mb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Specifications</span>
-                  <p className="text-sm text-slate-700 font-medium">{drug.composition}</p>
+                <div className="mb-3">
+                  <span className="section-label block mb-1">Specifications</span>
+                  <p className="text-label text-trust-text-secondary font-medium">{drug.composition}</p>
                 </div>
               )}
               {drug.drug_class && (
-                <div className="mb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Category</span>
-                  <p className="text-sm text-slate-700 font-medium">{drug.drug_class}</p>
+                <div className="mb-3">
+                  <span className="section-label block mb-1">Category</span>
+                  <p className="text-label text-trust-text-secondary font-medium">{drug.drug_class}</p>
                 </div>
               )}
               {drug.oncology_notes && (
-                <div className="bg-blue-50 rounded-xl p-3 border border-blue-100 mt-3">
-                  <div className="flex items-center gap-1 mb-1">
-                    <Info size={12} className="text-blue-600" />
-                    <span className="text-[10px] font-black text-blue-600 uppercase">Product Info</span>
+                <div className="bg-blue-50 rounded-card p-4 border border-blue-100 mt-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Info size={14} className="text-blue-600" />
+                    <span className="section-label text-blue-600">Product Info</span>
                   </div>
-                  <p className="text-xs text-blue-700 font-medium">{drug.oncology_notes}</p>
+                  <p className="text-label text-blue-700 font-medium">{drug.oncology_notes}</p>
                 </div>
               )}
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex flex-col gap-3 mt-2">
+          <div className="flex flex-col gap-3 mt-1">
             {drug.status !== "not_found" && (
               <button
                 onClick={onAddStock}
-                className="w-full h-14 bg-[#0f172a] text-white rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-[#0f172a]/20 active:scale-[0.98] transition-transform"
+                className="btn-primary w-full"
               >
                 <Plus size={20} />
                 Add to Stock
@@ -136,7 +138,7 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
             )}
             <button
               onClick={onClose}
-              className="w-full h-14 bg-slate-100 text-slate-600 rounded-2xl font-bold text-base active:scale-[0.98] transition-transform"
+              className="btn-secondary w-full"
             >
               Done
             </button>
