@@ -5,14 +5,6 @@ import { NextResponse } from "next/server";
 const NAFDAC_API_KEY = process.env.NAFDAC_API_KEY;
 const CHECKR_URL_BASE = "https://api.9jacheckr.xyz/api/verify";
 
-// Mock database cache for MVP (replace with Supabase calls in production)
-const mockKnownDrugs: Record<string, { name: string; manufacturer: string; status: string; composition?: string; drug_class?: string; oncology_notes?: string }> = {
-  "A4-1234": { name: "Paracetamol 500mg", manufacturer: "Emzor Pharmaceuticals Ltd", status: "verified", composition: "Paracetamol 500mg per tablet", drug_class: "Analgesic / Antipyretic" },
-  "A4-0001": { name: "Amoxicillin 250mg", manufacturer: "May & Baker Nigeria Ltd", status: "verified", composition: "Amoxicillin trihydrate equivalent to Amoxicillin 250mg", drug_class: "Beta-lactam Antibiotic" },
-  "B2-5678": { name: "Amalar Forte", manufacturer: "Unregistered Source", status: "caution" },
-  "C1-9999": { name: "Diazepam 5mg", manufacturer: "Sigma Pharmaceuticals", status: "verified", composition: "Diazepam 5mg", drug_class: "Benzodiazepine / Anxiolytic", oncology_notes: "Use with extreme caution in oncology patients on opioids — risk of respiratory depression" },
-};
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -24,24 +16,7 @@ export async function POST(request: Request) {
 
     const normalized = nafdac_number.trim().toUpperCase();
 
-    // 1. Check local mock cache (simulates Supabase cache check)
-    const cached = mockKnownDrugs[normalized] ?? mockKnownDrugs[nafdac_number.trim()];
-    if (cached) {
-      return NextResponse.json({
-        status: cached.status,
-        source: "cache",
-        drug: {
-          nafdac_number: normalized,
-          name: cached.name,
-          manufacturer: cached.manufacturer,
-          status: cached.status,
-          composition: cached.composition,
-          drug_class: cached.drug_class,
-          oncology_notes: (cached as any).oncology_notes,
-          cached_at: new Date().toISOString(),
-        },
-      });
-    }
+    // No mock data - all requests now bypass to the live API natively
 
     // 2. Call the live 9ja Checkr NAFDAC API
     if (NAFDAC_API_KEY) {
