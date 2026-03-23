@@ -38,6 +38,7 @@ export interface Transaction {
   cost_price?: number;
   selling_price?: number;
   margin?: number;
+  reason?: string;
   sold_at: string;
 }
 

@@ -122,6 +122,41 @@ export function sellFromInventory(drug_id: string, quantity: number): { success:
   return { success: true, remaining: totalAvailable - quantity };
 }
 
+export function adjustStock(drug_id: string, quantity: number, reason: string): { success: boolean; remaining: number } {
+  const batches = getBatches();
+  const drugBatches = batches
+    .filter((b) => b.drug_id === drug_id && b.quantity > 0)
+    .sort((a, b) => new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime()); 
+
+  const totalAvailable = drugBatches.reduce((sum, b) => sum + b.quantity, 0);
+  if (quantity > totalAvailable) return { success: false, remaining: totalAvailable };
+
+  let remaining = quantity;
+  const updatedBatches = batches.map((b) => {
+    if (b.drug_id !== drug_id || remaining === 0) return b;
+    const deduct = Math.min(b.quantity, remaining);
+    remaining -= deduct;
+    return { ...b, quantity: b.quantity - deduct };
+  });
+
+  saveBatches(updatedBatches.filter((b) => b.quantity > 0));
+  
+  const cachedDrug = getCachedDrug(drug_id);
+  logTransaction({
+    inventory_id: drugBatches[0]?.id ?? "",
+    drug_name: drugBatches[0]?.drug_name ?? "",
+    quantity: -quantity,
+    type: "adjustment",
+    cost_price: cachedDrug?.cost_price,
+    selling_price: 0, 
+    margin: 0,
+    reason: reason // Utilized the previously unused reason param
+  });
+
+  syncToCloud().catch(() => {}); 
+  return { success: true, remaining: totalAvailable - quantity };
+}
+
 // ─── TRANSACTIONS ─────────────────────────────────────
 export function getTransactions(): Transaction[] {
   if (typeof window === "undefined") return [];

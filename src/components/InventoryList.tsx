@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Package, Calendar, ShoppingCart, Plus, Search } from "lucide-react";
+import { ArrowLeft, Package, Calendar, ShoppingCart, Plus, Search, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InventoryItem } from "@/lib/types";
 import QuickSellModal from "./QuickSellModal";
+import AdjustStockModal from "./AdjustStockModal";
 
 interface InventoryListProps {
   items: InventoryItem[];
@@ -16,8 +17,9 @@ interface InventoryListProps {
 
 export default function InventoryList({ items, onAddNew, onBack, onRefresh }: InventoryListProps) {
   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
+  const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
-  const now = useMemo(() => Date.now(), []);
+  const [now] = useState(() => Date.now()); // Stable render timestamp to avoid impure useMemo warning
 
   const filtered = search.trim()
     ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.drug_reg_no.includes(search))
@@ -197,14 +199,21 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
                   </div>
                 </div>
 
-                {/* Sell action */}
-                <div className="border-t border-slate-100 bg-slate-50/30 px-5 py-3">
+                {/* Actions */}
+                <div className="border-t border-slate-100 bg-slate-50/30 px-5 py-3 flex gap-2">
                   <button
                     onClick={() => setSellTarget(item)}
-                    className="w-full h-12 bg-white border border-slate-200 text-[#004d40] font-black rounded-xl flex items-center justify-center gap-2 active:bg-slate-50 transition-colors shadow-sm"
+                    className="flex-[2] h-12 bg-white border border-slate-200 text-[#004d40] font-black rounded-xl flex items-center justify-center gap-2 active:bg-slate-50 transition-colors shadow-sm"
                   >
                     <ShoppingCart size={16} />
                     Quick Sell
+                  </button>
+                  <button
+                    onClick={() => setAdjustTarget(item)}
+                    className="flex-1 h-12 bg-white border border-slate-100 text-slate-400 font-bold rounded-xl flex items-center justify-center gap-2 active:bg-red-50 transition-colors shadow-sm text-xs"
+                  >
+                    <AlertTriangle size={14} />
+                    Adjust
                   </button>
                 </div>
               </motion.div>
@@ -223,13 +232,24 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
         </button>
       </div>
 
-      {/* Quick Sell Modal */}
+      {/* Modals */}
       {sellTarget && (
         <QuickSellModal
           item={sellTarget}
           onClose={() => setSellTarget(null)}
           onSold={() => {
             setSellTarget(null);
+            onRefresh();
+          }}
+        />
+      )}
+
+      {adjustTarget && (
+        <AdjustStockModal
+          item={adjustTarget}
+          onClose={() => setAdjustTarget(null)}
+          onAdjusted={() => {
+            setAdjustTarget(null);
             onRefresh();
           }}
         />
