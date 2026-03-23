@@ -251,7 +251,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
           >
             {loading ? <Loader2 size={24} className="animate-spin" /> : (
               <>
-                {mode === "login" ? "Sign In" : mode === "signup" ? "Get Started" : mode === "forgot" ? "Send Reset Link" : "Update Password"}
+                {mode === "login" ? "Sign In" : mode === "signup" ? "Get Started" : mode === "forgot" ? "Send Reset Link" : mode === "onboarding" ? "Finish Setup" : "Update Password"}
                 <ArrowRight size={20} />
               </>
             )}
