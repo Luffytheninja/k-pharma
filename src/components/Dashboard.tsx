@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, Package, Bell, Wifi, WifiOff, History, ArrowRight, LogOut } from "lucide-react";
 import { useOnlineStatus } from "@/lib/hooks";
@@ -16,6 +17,16 @@ interface DashboardProps {
 
 export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onLogout, alertCount = 0 }: DashboardProps) {
   const isOnline = useOnlineStatus();
+  const [displayName, setDisplayName] = useState<string>("");
+  
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.user_metadata?.display_name) {
+        setDisplayName(user.user_metadata.display_name);
+      }
+    });
+  }, []);
+
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
@@ -30,7 +41,7 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onL
       <header className="px-6 pt-14 pb-6 bg-[#0f172a] text-white rounded-b-[40px] shadow-xl shadow-[#0f172a]/20">
         <div className="flex items-start justify-between mb-1">
           <div>
-            <p className="text-white/60 text-sm font-medium">{greeting}</p>
+            <p className="text-white/60 text-sm font-medium">{greeting}{displayName ? `, ${displayName}` : ""}</p>
             <h1 className="text-3xl font-black tracking-tight leading-none">KO-Mart</h1>
           </div>
           <div className="flex flex-col items-end gap-2">

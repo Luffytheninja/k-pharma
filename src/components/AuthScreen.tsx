@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Mail, Lock, Store, ArrowRight, Loader2, AlertCircle, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -12,6 +12,13 @@ interface AuthScreenProps {
 
 export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScreenProps) {
   const [mode, setMode] = useState<"login" | "signup" | "onboarding" | "forgot" | "update_password">(initialMode);
+  
+  useEffect(() => {
+    if (initialMode) {
+      setMode(initialMode);
+    }
+  }, [initialMode]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pharmacyName, setPharmacyName] = useState("");
@@ -80,8 +87,12 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
   };
 
   const handleRegisterStore = async () => {
+    if (!username.trim()) {
+      setError("Please enter your name / username");
+      return;
+    }
     if (!pharmacyName.trim()) {
-      setError("Please enter a pharmacy name");
+      setError("Please enter a store name");
       return;
     }
 
