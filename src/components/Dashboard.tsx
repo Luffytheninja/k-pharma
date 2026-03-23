@@ -27,11 +27,11 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onL
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fa] pb-10">
       {/* Header */}
-      <header className="px-6 pt-14 pb-6 bg-[#004d40] text-white rounded-b-[40px] shadow-xl shadow-[#004d40]/20">
+      <header className="px-6 pt-14 pb-6 bg-[#0f172a] text-white rounded-b-[40px] shadow-xl shadow-[#0f172a]/20">
         <div className="flex items-start justify-between mb-1">
           <div>
             <p className="text-white/60 text-sm font-medium">{greeting}</p>
-            <h1 className="text-3xl font-black tracking-tight leading-none">K-Pharma</h1>
+            <h1 className="text-3xl font-black tracking-tight leading-none">KO-Mart</h1>
           </div>
           <div className="flex flex-col items-end gap-2">
             <button 
@@ -58,23 +58,23 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onL
           className="mx-6 mt-4 bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold px-4 py-3 rounded-2xl flex items-center gap-2"
         >
           <WifiOff size={16} />
-          Offline mode active — inventory and cached drugs available
+          Offline mode active — local inventory and SKU cache available
         </motion.div>
       )}
 
       <div className="px-6 mt-8 flex flex-col gap-4 flex-1">
-        {/* PRIMARY — Verify Drug (anchor feature) */}
+        {/* PRIMARY — Search / Verify (anchor feature) */}
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={onVerify}
-          className="w-full bg-[#004d40] text-white rounded-[28px] p-8 flex flex-col items-start gap-4 shadow-2xl shadow-[#004d40]/25 active:shadow-lg transition-all"
+          className="w-full bg-[#0f172a] text-white rounded-[28px] p-8 flex flex-col items-start gap-4 shadow-2xl shadow-[#0f172a]/25 active:shadow-lg transition-all"
         >
           <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center">
             <Search size={28} strokeWidth={2.5} />
           </div>
           <div>
-            <h2 className="text-2xl font-black tracking-tight leading-none">Verify Product</h2>
-            <p className="text-white/50 text-sm mt-1 font-medium">Enter NAFDAC registration number</p>
+            <h2 className="text-2xl font-black tracking-tight leading-none">Find Product</h2>
+            <p className="text-white/50 text-sm mt-1 font-medium">Search by Store SKU or Registration</p>
           </div>
         </motion.button>
 

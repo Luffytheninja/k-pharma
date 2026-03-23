@@ -32,9 +32,9 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
           <ArrowLeft size={22} />
         </button>
         <div className="text-center">
-          <h2 className="text-white font-black text-lg leading-none">Verify Product</h2>
+          <h2 className="text-white font-black text-lg leading-none">Find Product</h2>
           <p className="text-white/40 text-[11px] font-bold uppercase tracking-widest mt-0.5">
-            Manual Entry
+            Manual SKU Search
           </p>
         </div>
         <button
@@ -49,7 +49,7 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
             <motion.div 
               initial={{ y: 20 }}
               animate={{ y: 0 }}
-              className="absolute inset-0 bg-[#004d40] flex items-center justify-center"
+              className="absolute inset-0 bg-[#0f172a] flex items-center justify-center"
             >
               <span className="text-[8px] font-black uppercase leading-none">Soon</span>
             </motion.div>
@@ -61,18 +61,18 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
         <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
           <Search size={28} className="text-white" />
         </div>
-        <p className="text-white/60 text-sm font-medium mb-6 text-center">
-          Enter the NAFDAC registration number<br />
-          exactly as printed on the packaging
+        <p className="text-white/60 text-sm font-medium mb-6 text-center px-4">
+          Enter the Store SKU or NAFDAC ID<br />
+          exactly as printed on the item
         </p>
         <input
           autoFocus
           type="text"
-          placeholder="e.g. A4-1234"
+          placeholder="e.g. KO-1002 or A4-1234"
           value={regNo}
           onChange={(e) => setRegNo(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          className="w-full max-w-sm h-16 bg-white/10 backdrop-blur text-white text-xl font-bold text-center rounded-2xl border-2 border-white/20 focus:border-[#004d40] outline-none placeholder:text-white/20 tracking-wider transition-colors"
+          className="w-full max-w-sm h-16 bg-white/10 backdrop-blur text-white text-xl font-bold text-center rounded-2xl border-2 border-white/20 focus:border-[#0f172a] outline-none placeholder:text-white/20 tracking-wider transition-colors"
         />
       </div>
 
@@ -88,7 +88,7 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
         {isLoading ? (
           <div className="w-full h-14 bg-white/10 rounded-2xl flex items-center justify-center gap-3 text-white font-bold">
             <Loader2 size={20} className="animate-spin" />
-            Checking registry…
+            Searching registry…
           </div>
         ) : (
           <button
@@ -97,11 +97,11 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
             className={cn(
               "w-full h-14 rounded-2xl font-bold text-base transition-all active:scale-[0.98]",
               regNo.trim()
-                ? "bg-[#004d40] text-white shadow-lg shadow-[#004d40]/40"
+                ? "bg-[#0f172a] text-white shadow-lg shadow-[#0f172a]/40"
                 : "bg-white/10 text-white/40"
             )}
           >
-            Verify Product
+            Find Product
           </button>
         )}
       </div>

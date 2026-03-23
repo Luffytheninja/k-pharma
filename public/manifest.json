@@ -1,11 +1,11 @@
 {
-  "name": "K-Pharma",
-  "short_name": "KPharma",
-  "description": "Professional Pharmacy Tool",
+  "name": "KO-Mart",
+  "short_name": "KOMart",
+  "description": "Professional Retail Tool",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f9fa",
-  "theme_color": "#004d40",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "/icon.png",

@@ -75,10 +75,10 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
           <input
             type="text"
-            placeholder="Search by name or NAFDAC No."
+            placeholder="Search by name or registration..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-12 bg-slate-50 rounded-xl pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#004d40]/20 border border-slate-100 placeholder:text-slate-300"
+            className="w-full h-12 bg-slate-50 rounded-xl pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20 border border-slate-100 placeholder:text-slate-300"
           />
         </div>
       </div>
@@ -89,14 +89,14 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
           <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-300">
             <Package size={52} />
             <p className="font-bold text-sm text-slate-400">
-              {search ? "No drugs match your search" : "No drugs in inventory yet"}
+              {search ? "No products match your search" : "No products in inventory yet"}
             </p>
             {!search && (
               <button
                 onClick={onAddNew}
-                className="mt-2 bg-[#004d40] text-white text-sm font-bold px-6 py-3 rounded-xl"
+                className="mt-2 bg-[#0f172a] text-white text-sm font-bold px-6 py-3 rounded-xl"
               >
-                Verify &amp; Add First Drug
+                Find &amp; Add First Item
               </button>
             )}
           </div>

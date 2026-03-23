@@ -8,18 +8,18 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "K-Pharma | Professional Pharmacy Tool",
-  description: "Fast, offline-resilient drug verification and inventory for community pharmacists.",
+  title: "KO-Mart | Professional Retail Tool",
+  description: "Fast, offline-resilient product verification and inventory for retail owners.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "K-Pharma",
+    title: "KO-Mart",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#004d40",
+  themeColor: "#0f172a",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

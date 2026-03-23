@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, AlertTriangle, XCircle, Plus, FlaskConical, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,20 +16,20 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
 
   const configs = {
     verified: {
-      bg: "bg-[#2e7d32]",
-      light: "bg-green-50 border-green-100",
+      bg: "bg-[#0f172a]",
+      light: "bg-slate-50 border-slate-100",
       icon: <CheckCircle className="text-white" size={40} />,
       header: "Verified",
-      subtext: "Safe to dispense",
-      textColor: "text-[#2e7d32]",
-      badge: "bg-green-100 text-[#2e7d32]",
+      subtext: "Safe for retail sale",
+      textColor: "text-[#0f172a]",
+      badge: "bg-slate-100 text-[#0f172a]",
     },
     caution: {
       bg: "bg-[#ff8f00]",
       light: "bg-amber-50 border-amber-100",
       icon: <AlertTriangle className="text-white" size={40} />,
       header: "Caution",
-      subtext: "Verify source before dispensing",
+      subtext: "Verify supply chain before sale",
       textColor: "text-[#ff8f00]",
       badge: "bg-amber-100 text-[#ff8f00]",
     },
@@ -39,7 +38,7 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
       light: "bg-red-50 border-red-100",
       icon: <XCircle className="text-white" size={40} />,
       header: "Not Verified",
-      subtext: "Drug not found in NAFDAC registry",
+      subtext: "Item not found in regulatory registry",
       textColor: "text-[#c62828]",
       badge: "bg-red-100 text-[#c62828]",
     },
@@ -76,13 +75,13 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
         </div>
 
         <div className="p-6 flex flex-col gap-4">
-          {/* Drug details card */}
+          {/* Product details card */}
           {drug.name && drug.name !== "Unknown Drug" && (
             <div className={cn("rounded-2xl border p-5", cfg.light)}>
               <h3 className="text-lg font-black text-slate-800">{drug.name}</h3>
               <div className="grid grid-cols-2 gap-y-3 mt-3">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">NAFDAC No.</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ID / Registration</span>
                   <span className="text-sm font-mono font-bold text-slate-700">{drug.nafdac_number}</span>
                 </div>
                 <div>
@@ -97,28 +96,28 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
           {proMode && drug.status !== "not_found" && (drug.composition || drug.drug_class || drug.oncology_notes) && (
             <div className="bg-slate-50 rounded-2xl border border-slate-100 p-5">
               <div className="flex items-center gap-2 mb-3">
-                <FlaskConical size={16} className="text-[#004d40]" />
-                <span className="text-xs font-black text-[#004d40] uppercase tracking-wider">Professional Mode</span>
+                <FlaskConical size={16} className="text-[#0f172a]" />
+                <span className="text-xs font-black text-[#0f172a] uppercase tracking-wider">Product Deep-Scan</span>
               </div>
               {drug.composition && (
                 <div className="mb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Composition</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Specifications</span>
                   <p className="text-sm text-slate-700 font-medium">{drug.composition}</p>
                 </div>
               )}
               {drug.drug_class && (
                 <div className="mb-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Drug Class</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase">Category</span>
                   <p className="text-sm text-slate-700 font-medium">{drug.drug_class}</p>
                 </div>
               )}
               {drug.oncology_notes && (
-                <div className="bg-purple-50 rounded-xl p-3 border border-purple-100 mt-3">
+                <div className="bg-blue-50 rounded-xl p-3 border border-blue-100 mt-3">
                   <div className="flex items-center gap-1 mb-1">
-                    <Info size={12} className="text-purple-600" />
-                    <span className="text-[10px] font-black text-purple-600 uppercase">Oncology Note</span>
+                    <Info size={12} className="text-blue-600" />
+                    <span className="text-[10px] font-black text-blue-600 uppercase">Product Info</span>
                   </div>
-                  <p className="text-xs text-purple-700 font-medium">{drug.oncology_notes}</p>
+                  <p className="text-xs text-blue-700 font-medium">{drug.oncology_notes}</p>
                 </div>
               )}
             </div>
@@ -129,7 +128,7 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
             {drug.status !== "not_found" && (
               <button
                 onClick={onAddStock}
-                className="w-full h-14 bg-[#004d40] text-white rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-[#004d40]/20 active:scale-[0.98] transition-transform"
+                className="w-full h-14 bg-[#0f172a] text-white rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-[#0f172a]/20 active:scale-[0.98] transition-transform"
               >
                 <Plus size={20} />
                 Add to Stock
