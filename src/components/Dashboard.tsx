@@ -1,21 +1,28 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Search, Package, Bell, Wifi, WifiOff, History, ArrowRight } from "lucide-react";
+import { Search, Package, Bell, Wifi, WifiOff, History, ArrowRight, LogOut } from "lucide-react";
 import { useOnlineStatus } from "@/lib/hooks";
+import { supabase } from "@/lib/supabase";
 
 interface DashboardProps {
   onVerify: () => void;
   onInventory: () => void;
   onAlerts: () => void;
   onLogs: () => void;
+  onLogout: () => void;
   alertCount?: number;
 }
 
-export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, alertCount = 0 }: DashboardProps) {
+export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onLogout, alertCount = 0 }: DashboardProps) {
   const isOnline = useOnlineStatus();
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onLogout();
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9fa] pb-10">
@@ -26,11 +33,19 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, ale
             <p className="text-white/60 text-sm font-medium">{greeting}</p>
             <h1 className="text-3xl font-black tracking-tight leading-none">K-Pharma</h1>
           </div>
-          <div className={`flex items-center gap-1.5 mt-1 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-            isOnline ? "bg-white/15 text-white/80" : "bg-red-500/20 text-red-300"
-          }`}>
-            {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
-            {isOnline ? "Online" : "Offline"}
+          <div className="flex flex-col items-end gap-2">
+            <button 
+              onClick={handleLogout}
+              className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white/60 hover:text-white"
+            >
+              <LogOut size={18} />
+            </button>
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+              isOnline ? "bg-white/15 text-white/80" : "bg-red-500/20 text-red-300"
+            }`}>
+              {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
+              {isOnline ? "Online" : "Offline"}
+            </div>
           </div>
         </div>
       </header>

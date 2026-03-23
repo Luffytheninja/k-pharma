@@ -24,28 +24,41 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        checkOnboarding();
+        await checkOnboarding();
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
+        
+        // If Supabase is configured to not auto-login (e.g. email confirm required)
+        if (!data.session) {
+          setError("Account created! Please check your email to verify before logging in.");
+          return;
+        }
+        
         setMode("onboarding");
       }
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || "An authentication error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   const checkOnboarding = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const { data: { user }, error: uErr } = await supabase.auth.getUser();
+    if (uErr) throw uErr;
+    if (!user) {
+      setError("No active session found. Please try logging in again.");
+      return;
+    }
 
-    const { data: pharmacy } = await supabase
+    const { data: pharmacy, error: pErr } = await supabase
       .from("pharmacies")
       .select("*")
       .eq("owner_id", user.id)
-      .single();
+      .maybeSingle();
+
+    if (pErr) throw pErr;
 
     if (pharmacy) {
       onSuccess();
@@ -55,10 +68,31 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
   };
 
   const handleRegisterStore = async () => {
+    if (!pharmacyName.trim()) {
+      setError("Please enter a pharmacy name");
+      return;
+    }
+
     setLoading(true);
+    setError("");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { user }, error: uErr } = await supabase.auth.getUser();
+      if (uErr) throw uErr;
+      if (!user) {
+        throw new Error("Session expired. Please log in again.");
+      }
+
+      // Check if pharmacy already exists for this user (prevent duplicates)
+      const { data: existing } = await supabase
+        .from("pharmacies")
+        .select("id")
+        .eq("owner_id", user.id)
+        .maybeSingle();
+
+      if (existing) {
+        onSuccess();
+        return;
+      }
 
       const { data: pharmacy, error: pErr } = await supabase
         .from("pharmacies")
@@ -69,14 +103,17 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
       if (pErr) throw pErr;
 
       // Create initial branch
-      await supabase.from("branches").insert([{ 
+      const { error: bErr } = await supabase.from("branches").insert([{ 
         pharmacy_id: pharmacy.id, 
         name: "Main Branch" 
       }]);
 
+      if (bErr) throw bErr;
+
       onSuccess();
     } catch (e: any) {
-      setError(e.message);
+      console.error("Store Registration Error:", e);
+      setError(e.message || "Failed to register store. Check your internet connection.");
     } finally {
       setLoading(false);
     }

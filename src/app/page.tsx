@@ -149,6 +149,7 @@ export default function Home() {
               onInventory={() => { refreshInventory(); setView("inventory"); }}
               onAlerts={() => { refreshInventory(); setView("alerts"); }}
               onLogs={() => { refreshInventory(); setView("logs"); }}
+              onLogout={() => { setIsAuthed(false); setView("dashboard"); }}
               alertCount={alertCount}
             />
           </motion.div>
