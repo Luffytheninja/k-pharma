@@ -58,7 +58,7 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, alertCount 
           </div>
           <div>
             <h2 className="text-2xl font-black tracking-tight leading-none">Verify Product</h2>
-            <p className="text-white/50 text-sm mt-1 font-medium">Scan barcode or enter NAFDAC No.</p>
+            <p className="text-white/50 text-sm mt-1 font-medium">Enter NAFDAC registration number</p>
           </div>
         </motion.button>
 
