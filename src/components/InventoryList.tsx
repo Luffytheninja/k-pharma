@@ -173,11 +173,12 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
 
                   <div className="flex gap-6">
                     <div>
-                      <p className="text-label font-semibold text-trust-text-secondary">
+                      <span className="section-label block mb-1">{isAdmin ? "Cost | Retail" : "Unit Price"}</span>
+                      <p className="text-label font-bold text-trust-text-secondary leading-none mt-1">
                         {isAdmin ? (
-                          <>Cost ₦{cost.toLocaleString()} <span className="text-trust-text-faint">|</span> Sell ₦{sell.toLocaleString()}</>
+                          <>₦{cost.toLocaleString()} <span className="text-trust-text-faint mx-1">|</span> ₦{sell.toLocaleString()}</>
                         ) : (
-                          <>Unit Price ₦{sell.toLocaleString()}</>
+                          sell > 0 ? `₦${sell.toLocaleString()}` : <span className="text-warning">₦0 (Unset)</span>
                         )}
                       </p>
                     </div>

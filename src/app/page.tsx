@@ -171,32 +171,42 @@ export default function HomePage() {
           {view === "home" ? "KO-Mart" : view === "verify" ? "Scanner" : view === "logs" ? "Audit Log" : view === "dashboard" ? "Dashboard" : view}
         </h1>
       </div>
-      <button 
-        onClick={() => {
-          if (isAdminVerified) {
-            setIsAdminVerified(false);
-            setView("home");
-          } else {
-            supabase.auth.signOut().then(() => setIsAuthed(false));
-          }
-        }}
-        className={cn(
-          "px-4 h-9 rounded-badge flex items-center justify-center gap-2 transition-all font-bold text-[11px] uppercase tracking-wider",
-          isAdminVerified ? "bg-warning/10 text-warning border border-warning/20" : "bg-trust-surface text-trust-text-muted"
+      <div className="flex gap-2">
+        {!isAdminVerified && (
+          <button 
+            onClick={() => setPendingAdminView("dashboard")}
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-trust-surface text-trust-text-muted hover:text-brand hover:bg-brand-50 transition-colors"
+          >
+            <Lock size={18} />
+          </button>
         )}
-      >
-        {isAdminVerified ? (
-          <>
-            <Lock size={14} />
-            Lock
-          </>
-        ) : (
-          <>
-            <LogOut size={14} />
-            Logout
-          </>
-        )}
-      </button>
+        <button 
+          onClick={() => {
+            if (isAdminVerified) {
+              setIsAdminVerified(false);
+              setView("home");
+            } else {
+              supabase.auth.signOut().then(() => setIsAuthed(false));
+            }
+          }}
+          className={cn(
+            "px-4 h-9 rounded-badge flex items-center justify-center gap-2 transition-all font-bold text-[11px] uppercase tracking-wider",
+            isAdminVerified ? "bg-warning/10 text-warning border border-warning/20" : "bg-trust-surface text-trust-text-muted"
+          )}
+        >
+          {isAdminVerified ? (
+            <>
+              <Lock size={14} />
+              Lock
+            </>
+          ) : (
+            <>
+              <LogOut size={14} />
+              Out
+            </>
+          )}
+        </button>
+      </div>
     </header>
   );
 
