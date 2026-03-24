@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Package, Calendar, ShoppingCart, Plus, Search, AlertTriangle } from "lucide-react";
+import { Package, Calendar, ShoppingCart, Plus, Search, AlertTriangle, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InventoryItem } from "@/lib/types";
 import AddToCartModal from "./AddToCartModal";
@@ -16,9 +16,10 @@ interface InventoryListProps {
   isAdmin?: boolean;
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
+  onBack?: () => void;
 }
 
-export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = false, cart, setCart }: InventoryListProps) {
+export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = false, cart, setCart, onBack }: InventoryListProps) {
   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
   const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
@@ -59,6 +60,23 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
 
   return (
     <div className="flex flex-col min-h-screen bg-trust-surface p-4 md:p-8">
+      {/* Header with Back Button for Staff/POS navigation */}
+      <div className="flex items-center gap-4 mb-6 md:mb-8">
+        {onBack && (
+          <button 
+            onClick={onBack} 
+            className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-trust-text-secondary border border-trust-border shadow-sm hover:bg-brand-50 hover:text-brand transition-all flex-shrink-0"
+            title="Back"
+          >
+            <ArrowLeft size={22} />
+          </button>
+        )}
+        <div>
+          <h2 className="text-section-header font-bold text-trust-text tracking-tight uppercase">OTC POS Terminal</h2>
+          <p className="text-label-sm text-trust-text-muted font-medium uppercase tracking-widest mt-0.5">Inventory Management</p>
+        </div>
+      </div>
+
       {/* Summary Row - Hidden for non-admins */}
       {isAdmin && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">

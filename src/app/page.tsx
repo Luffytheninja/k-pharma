@@ -430,6 +430,7 @@ export default function HomePage() {
                   isAdmin={isAdminVerified}
                   cart={cart}
                   setCart={setCart}
+                  onBack={() => navigateTo("home")}
                 />
               </motion.div>
             )}
