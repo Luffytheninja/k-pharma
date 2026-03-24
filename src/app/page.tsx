@@ -163,7 +163,7 @@ export default function HomePage() {
   };
 
   const TopHeader = () => (
-    <header className="md:hidden bg-white border-b border-trust-border px-6 py-4 flex items-center justify-between z-30 shadow-sm sticky top-0 h-16">
+    <header className="bg-white border-b border-trust-border px-6 py-4 flex items-center justify-between z-30 shadow-sm sticky top-0 h-16">
       <div className="flex items-center gap-3">
         {view !== "home" ? (
           <button onClick={() => navigateTo("home")} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-trust-text-secondary hover:bg-trust-surface transition-colors">
