@@ -1,22 +1,24 @@
-# KO-Mart (K-Pharma PWA)
+# KO-Mart (Premium Retail PWA)
 
-A premium, secure, and mobile-first Pharmaceutical Management Solution designed for retail pharmacies.
+A high-performance, secure, and offline-first Pharmaceutical & Retail Management Solution.
 
 ## Core Features
 
-- **🛡️ Multi-Role Security**: Intelligent switching between **Staff Mode** (Retail) and **Manager Mode** (Admin).
-- **🔒 PIN-Protected Audits**: Sensitive operations like activity logs, stock adjustments, and financial summaries are locked behind a secure PIN.
-- **📱 Mobile-First UX**: Specifically optimized for high-density mobile displays and portrait/landscape tablet modes.
-- **⚖️ Privacy Controls**: Cost prices are automatically hidden during retail sales to ensure wholesale data isn't exposed to customers.
-- **🔍 Smart Verification**: NAFCAC-integrated product scanner and registry verification.
+- **📶 True Offline Support**: Built with **Serwist** for advanced PWA caching. Work, scan, and sell even without an internet connection.
+- **🛡️ Multi-Role Security**: Intelligent switching between **Staff Mode** (Sales) and **Manager Mode** (Admin) with **bcrypt-hashed PIN protection**.
+- **💳 Financial Reconciliation**: Integrated tracking for **Cash**, **POS**, and **Bank Transfer** payments with real-time margin analysis.
+- **📄 Digital Receipts**: Instant receipt generation with one-tap sharing (WhatsApp/Copy-to-Clipboard) for customers.
+- **📱 Mobile-First UX**: Premium "Modern Trust" design system with glassmorphism and metallic accents, optimized for tablets and mobile.
+- **🔍 Smart Verification**: NAFCAC-integrated product scanner and regulatory registry verification.
 - **📢 Real-time Alerts**: Automated tracking for low stock and expiring items within 30 days.
 
 ## Tech Stack
 
-- **Framework**: Next.js 15+ (App Router)
-- **Styling**: Tailwind CSS with custom Design Tokens (Glassmorphism, Neon/Metallic accents)
+- **Framework**: Next.js 16+ (App Router, Webpack-optimized)
+- **Offline**: Serwist (@serwist/next)
+- **Styling**: Tailwind CSS + CSS Variable Design Tokens
 - **Database**: Supabase (PostgreSQL + Realtime)
-- **Security**: Local PIN verification + Supabase Auth
+- **Security**: Local PIN verification (bcryptjs) + Supabase Auth
 
 ## Development
 
@@ -24,21 +26,23 @@ A premium, secure, and mobile-first Pharmaceutical Management Solution designed 
    ```env
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   NAFDAC_API_KEY=...
    ```
 2. Install dependencies: `npm install`
-3. Run dev server: `npm run dev`
+3. Database Setup: Run the `supabase_schema_upgrade.sql` in the Supabase SQL Editor to align your backend with the current scaling.
+4. Run dev server: `npm run dev`
 
 ## Operations
 
 ### Staff Mode (Default)
-- **Sell Product**: Record retail sales with simple unit pricing.
+- **Sell Product**: Record retail sales with triple-payment options.
+- **Receipts**: Generate and share customer transaction summaries.
 - **Add Stock**: Scan and verify new products into the local cache.
 
 ### Manager Mode (Enter PIN)
-- **Overview**: Real-time revenue and sales tracking.
-- **Inventory Control**: Bulk adjustments and cost-price tracking.
+- **Overview**: Real-time revenue, sales tracking, and profitability analysis.
+- **Inventory Control**: Bulk adjustments, cost-price tracking, and reorder threshold management.
 - **Audit Trail**: Full historical log of every transaction.
-- **Lock**: Quick-lock functionality to return to Staff Mode instantly.
 
 ---
-Designed with ❤️ for Advanced Pharmaceutical Retail.
+Designed with ❤️ for Scalable African Retail.
