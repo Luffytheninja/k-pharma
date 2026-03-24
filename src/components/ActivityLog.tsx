@@ -1,16 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, History, TrendingUp, TrendingDown, Search, Download, Trash2, Calendar } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { History, TrendingUp, TrendingDown, Search, Download, Trash2, Calendar } from "lucide-react";
 import { getTransactions, purgeAllAppData } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
-interface ActivityLogProps {
-  onBack: () => void;
-}
-
-export default function ActivityLog({ onBack }: ActivityLogProps) {
+export default function ActivityLog() {
   const allTxs = useMemo(() => getTransactions(), []);
   const [search, setSearch] = useState("");
   const [showConfirmReset, setShowConfirmReset] = useState(false);
@@ -61,59 +57,57 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-trust-surface">
-      {/* Header */}
-      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-4">
-            <button onClick={onBack} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Activity Log</h1>
-              <p className="text-trust-text-muted text-label font-medium mt-0.5">Audit Trail & Ledger</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={handleExport} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-brand hover:bg-brand-50 transition-colors duration-200">
-              <Download size={20} />
-            </button>
-            <button onClick={() => setShowConfirmReset(true)} className="w-11 h-11 bg-danger-light rounded-button flex items-center justify-center text-danger hover:bg-danger/10 transition-colors duration-200">
-              <Trash2 size={20} />
-            </button>
-          </div>
+      {/* Toolbar */}
+      <div className="flex justify-between items-center px-6 md:px-8 pt-6 mb-6">
+        <div className="flex flex-col">
+          <h2 className="text-heading-md font-bold text-trust-text">Audit Trail</h2>
+          <p className="text-label-sm text-trust-text-muted font-medium">{filtered.length} entries found</p>
         </div>
-
-        {/* Quick Summary */}
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-2 px-2 mb-5">
-          <div className="card-premium bg-brand text-white px-5 py-4 min-w-[150px] shadow-elevated" style={{ borderColor: 'transparent' }}>
-            <span className="section-label text-white/60 block">Revenue (Logged)</span>
-            <p className="text-body-lg font-bold mt-1">₦{stats.totalRevenue.toLocaleString()}</p>
-          </div>
-          <div className="card px-5 py-4 min-w-[130px]">
-            <span className="section-label block">Total Sales</span>
-            <p className="text-body-lg font-bold text-trust-text mt-1">{stats.salesCount}</p>
-          </div>
-          <div className="card px-5 py-4 min-w-[130px]">
-            <span className="section-label block">Restocks</span>
-            <p className="text-body-lg font-bold text-trust-text mt-1">{stats.totalRestock}</p>
-          </div>
-        </div>
-
-        <div className="input-icon">
-          <Search size={18} className="icon" />
-          <input
-            type="text"
-            placeholder="Search log..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input-field"
-            style={{ paddingLeft: '48px', height: '48px' }}
-          />
+        <div className="flex gap-2">
+          <button onClick={handleExport} className="w-11 h-11 bg-white border border-trust-border rounded-button flex items-center justify-center text-brand hover:bg-brand-50 transition-colors duration-200 shadow-sm">
+            <Download size={20} />
+          </button>
+          <button onClick={() => setShowConfirmReset(true)} className="w-11 h-11 bg-danger-light border border-danger-border rounded-button flex items-center justify-center text-danger hover:bg-danger/10 transition-colors duration-200 shadow-sm">
+            <Trash2 size={20} />
+          </button>
         </div>
       </div>
 
+        {/* Quick Summary */}
+        <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-2 px-6 md:px-8 mb-8 snap-x">
+          <div className="relative overflow-hidden bg-brand text-white p-6 min-w-[200px] rounded-[24px] shadow-lg snap-start flex-1 border border-white/10">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <span className="text-[10px] font-bold text-white/50 uppercase tracking-[0.15em] block mb-1">Total Revenue</span>
+            <p className="text-heading-xl font-bold truncate tabular-nums">₦{stats.totalRevenue.toLocaleString()}</p>
+          </div>
+          
+          <div className="card-premium p-6 min-w-[170px] snap-start flex-1 shadow-sm">
+            <span className="section-label block mb-1">Sales count</span>
+            <p className="text-heading-lg font-bold text-trust-text tabular-nums">{stats.salesCount}</p>
+          </div>
+
+          <div className="card-premium p-6 min-w-[170px] snap-start flex-1 shadow-sm">
+            <span className="section-label block mb-1">Restocks</span>
+            <p className="text-heading-lg font-bold text-trust-text tabular-nums">{stats.totalRestock}</p>
+          </div>
+        </div>
+
+        <div className="px-4 md:px-8 mb-4">
+          <div className="input-icon">
+            <Search size={18} className="icon" />
+            <input
+              type="text"
+              placeholder="Search logs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input-field shadow-sm !h-12 !bg-white"
+              style={{ paddingLeft: '48px' }}
+            />
+          </div>
+        </div>
+
       {/* List */}
-      <div className="flex-1 p-7 space-y-3">
+      <div className="flex-1 px-4 md:px-8 pb-10 space-y-3">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 gap-4 text-trust-text-faint">
             <History size={44} />
@@ -121,30 +115,33 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
           </div>
         ) : (
           filtered.map((tx) => (
-            <div key={tx.id} className="card p-5 flex items-center gap-4">
+            <div key={tx.id} className="card p-4 flex items-center gap-3.5 md:gap-5">
               <div className={cn(
-                "w-12 h-12 rounded-button flex items-center justify-center shrink-0",
-                tx.type === "sale" ? "bg-success-light text-success" : "bg-blue-50 text-blue-600"
+                "w-11 h-11 md:w-12 md:h-12 rounded-button flex items-center justify-center shrink-0 shadow-sm",
+                tx.type === "sale" ? "bg-success-light text-success" : tx.type === "restock" ? "bg-blue-50 text-blue-600" : "bg-warning-light text-warning"
               )}>
-                {tx.type === "sale" ? <TrendingDown size={22} /> : <TrendingUp size={22} />}
+                {tx.type === "sale" ? <TrendingDown size={20} /> : tx.type === "restock" ? <TrendingUp size={20} /> : <Search size={20} />}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-bold text-trust-text text-label truncate">{tx.drug_name}</h4>
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-bold text-trust-text text-label md:text-body truncate leading-tight">{tx.drug_name}</h4>
                   <span className={cn(
-                    "badge ml-2",
-                    tx.type === "sale" ? "badge-success" : "badge-neutral"
+                    "px-2 py-0.5 rounded-badge text-[10px] font-bold uppercase tracking-wider border shrink-0 ml-2",
+                    tx.type === "sale" ? "bg-success/10 text-success border-success/20" : 
+                    tx.type === "restock" ? "bg-blue-50 text-blue-600 border-blue-100" :
+                    "bg-warning/10 text-warning border-warning/20"
                   )}>
                     {tx.type}
                   </span>
                 </div>
-                <div className="flex items-center justify-between mt-1.5">
-                  <p className="text-label font-semibold text-trust-text-secondary tracking-tight">
-                    {tx.quantity > 0 ? "+" : ""}{tx.quantity} units 
-                    {tx.selling_price && ` · ₦${(Math.abs(tx.quantity)*tx.selling_price).toLocaleString()}`}
+                <div className="flex items-center justify-between">
+                  <p className="text-label-sm md:text-label font-bold text-trust-text-secondary">
+                    {tx.quantity > 0 ? "+" : ""}{tx.quantity} <span className="font-medium opacity-60">units</span>
+                    {tx.selling_price && (
+                      <span className="ml-1.5 opacity-80 tabular-nums">· ₦{(Math.abs(tx.quantity)*tx.selling_price).toLocaleString()}</span>
+                    )}
                   </p>
-                  <div className="flex items-center gap-1.5 text-label-sm text-trust-text-muted font-semibold">
-                    <Calendar size={12} />
+                  <div className="flex items-center gap-1 text-[11px] text-trust-text-muted font-bold tabular-nums">
                     {new Date(tx.sold_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -155,39 +152,41 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
       </div>
 
       {/* Reset Confirmation */}
-      {showConfirmReset && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-7">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
-          <motion.div 
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white rounded-modal p-8 w-full max-w-sm relative z-10 text-center shadow-elevated"
-          >
-            <div className="w-16 h-16 bg-danger-light border border-danger-border text-danger rounded-card flex items-center justify-center mx-auto mb-6">
-              <Trash2 size={28} />
-            </div>
-            <h3 className="text-heading-lg font-bold text-trust-text mb-3">Factory Reset?</h3>
-            <p className="text-trust-text-secondary text-label font-medium mb-8 leading-relaxed">
-              This will permanently delete all inventory, logs, and settings. This cannot be undone.
-            </p>
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={purgeAllAppData}
-                className="btn-danger w-full"
-              >
-                CLEAR EVERYTHING
-              </button>
-              <button 
-                onClick={() => setShowConfirmReset(false)}
-                className="btn-secondary w-full"
-              >
-                Cancel
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showConfirmReset && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 md:p-10">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-[24px] p-6 md:p-8 w-full max-w-[360px] relative z-10 text-center shadow-2xl"
+            >
+              <div className="w-14 h-14 bg-danger-light border border-danger-border text-danger rounded-full flex items-center justify-center mx-auto mb-5">
+                <Trash2 size={24} />
+              </div>
+              <h3 className="text-heading-lg font-bold text-trust-text mb-2">Factory Reset?</h3>
+              <p className="text-trust-text-secondary text-label-sm font-medium mb-8 leading-relaxed">
+                This will permanently delete all logs and settings for this store. This cannot be undone.
+              </p>
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={purgeAllAppData}
+                  className="btn-danger w-full py-3.5"
+                >
+                  CLEAR EVERYTHING
+                </button>
+                <button 
+                  onClick={() => setShowConfirmReset(false)}
+                  className="btn-secondary w-full py-3.5"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

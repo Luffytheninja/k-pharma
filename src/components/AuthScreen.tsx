@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Mail, Lock, Store, ArrowRight, Loader2, AlertCircle, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { setPharmacyId, syncFromCloud, setStoredPin } from "@/lib/store";
 
 interface AuthScreenProps {
   onSuccess: () => void;
@@ -23,6 +24,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
   const [password, setPassword] = useState("");
   const [pharmacyName, setPharmacyName] = useState("");
   const [username, setUsername] = useState("");
+  const [adminPin, setAdminPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -81,6 +83,8 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
     if (pErr) throw pErr;
 
     if (pharmacy) {
+      setPharmacyId(pharmacy.id);
+      await syncFromCloud();
       onSuccess();
     } else {
       setMode("onboarding");
@@ -94,6 +98,10 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
     }
     if (!pharmacyName.trim()) {
       setError("Please enter a store name");
+      return;
+    }
+    if (adminPin.length !== 4 || !/^\d+$/.test(adminPin)) {
+      setError("Please enter a 4-digit Admin PIN");
       return;
     }
 
@@ -137,6 +145,9 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
 
       if (bErr) throw bErr;
 
+      setPharmacyId(pharmacy.id);
+      setStoredPin(adminPin);
+      await syncFromCloud();
       onSuccess();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to register store. Check your internet connection.";
@@ -214,6 +225,24 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
                     onChange={(e) => setPharmacyName(e.target.value)}
                     className="input-field"
                     style={{ paddingLeft: '48px' }}
+                  />
+                </div>
+                {/* Admin PIN */}
+                <div className="input-icon">
+                  <Lock className="icon" size={20} />
+                  <input
+                    type="password"
+                    placeholder="Create 4-Digit Admin PIN"
+                    value={adminPin}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                      setAdminPin(val);
+                    }}
+                    maxLength={4}
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    className="input-field"
+                    style={{ paddingLeft: '48px', letterSpacing: '4px', fontSize: '18px' }}
                   />
                 </div>
               </motion.div>

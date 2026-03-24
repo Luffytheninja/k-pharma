@@ -1,21 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Search, Package, Bell, Wifi, WifiOff, History, ArrowRight, LogOut } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Package, TrendingUp, AlertTriangle, ArrowRight, DollarSign, ShoppingCart, ShieldCheck } from "lucide-react";
 import { useOnlineStatus } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
+import { getInventoryItems, getTransactions } from "@/lib/store";
 
 interface DashboardProps {
   onVerify: () => void;
   onInventory: () => void;
   onAlerts: () => void;
   onLogs: () => void;
-  onLogout: () => void;
   alertCount?: number;
 }
 
-export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onLogout, alertCount = 0 }: DashboardProps) {
+export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, alertCount = 0 }: DashboardProps) {
   const isOnline = useOnlineStatus();
   const [displayName, setDisplayName] = useState<string>("");
   
@@ -27,129 +26,157 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onL
     });
   }, []);
 
+  const inventory = useMemo(() => getInventoryItems(), []);
+  const transactions = useMemo(() => getTransactions(), []);
+
+  const metrics = useMemo(() => {
+    const activeProducts = inventory.length;
+    
+    const today = new Date().toDateString();
+    const todaySales = transactions.filter(t => 
+      t.type === "sale" && new Date(t.sold_at).toDateString() === today
+    );
+    
+    const salesCount = todaySales.length;
+    const todayRevenue = todaySales.reduce((sum, t) => sum + (Math.abs(t.quantity) * (t.selling_price || 0)), 0);
+
+    return { activeProducts, salesCount, todayRevenue };
+  }, [inventory, transactions]);
+
+  const recentTxs = useMemo(() => transactions.slice(0, 3), [transactions]);
+
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    onLogout();
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-trust-surface pb-10">
-      {/* ── Header ── */}
-      <header className="px-7 pt-14 pb-8 bg-brand text-white rounded-b-[32px] shadow-elevated relative overflow-hidden">
-        {/* Metallic trim at bottom edge */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-metallic-dark via-metallic-light to-metallic-dark opacity-30" />
-        
-        <div className="flex items-start justify-between mb-1">
-          <div>
-            <p className="text-white/60 text-label font-medium">{greeting}{displayName ? `, ${displayName}` : ""}</p>
-            <h1 className="text-heading-xl font-bold tracking-tight leading-none mt-1">KO-Mart</h1>
-          </div>
-          <div className="flex flex-col items-end gap-3">
-            <button 
-              onClick={handleLogout}
-              className="w-11 h-11 bg-white/10 rounded-button flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 transition-all duration-200"
-            >
-              <LogOut size={18} />
-            </button>
-            <div className={`flex items-center gap-2 px-3 py-2 rounded-badge text-label-sm font-semibold ${
-              isOnline ? "bg-white/12 text-white/75" : "bg-danger/20 text-red-300"
-            }`}>
-              {isOnline ? <Wifi size={14} /> : <WifiOff size={14} />}
-              {isOnline ? "Online" : "Offline"}
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col min-h-screen bg-trust-surface p-4 md:p-8">
+      
+      {/* ── Welcome Header ── */}
+      <div className="mb-6 md:mb-8">
+        <p className="text-trust-text-secondary text-label-sm md:text-label font-medium">{greeting}{displayName ? `, ${displayName}` : ""}</p>
+        <h1 className="text-heading-lg md:text-heading-xl font-bold tracking-tight text-trust-text mt-1">Store Overview</h1>
+      </div>
 
-      {/* ── Offline Banner ── */}
       {!isOnline && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          className="mx-7 mt-5 bg-warning-light border border-warning-border text-warning text-label font-semibold px-5 py-4 rounded-card flex items-center gap-3"
-        >
-          <WifiOff size={18} />
-          Offline mode — local inventory and SKU cache available
-        </motion.div>
+        <div className="mb-8 bg-warning-light border border-warning-border text-warning text-label font-semibold px-5 py-4 rounded-card flex items-center gap-3">
+          <AlertTriangle size={18} />
+          Offline mode active — operating from local cache
+        </div>
       )}
 
-      <div className="px-7 mt-8 flex flex-col gap-5 flex-1">
-        {/* ── PRIMARY — Find Product (anchor feature) ── */}
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          onClick={onVerify}
-          className="card-premium w-full bg-brand text-white p-7 flex flex-col items-start gap-5 shadow-elevated active:shadow-card transition-all duration-200"
-          style={{ borderColor: 'transparent' }}
-        >
-          <div className="w-14 h-14 bg-white/12 rounded-card flex items-center justify-center">
-            <Search size={26} strokeWidth={2} />
-          </div>
-          <div>
-            <h2 className="text-heading-lg font-bold tracking-tight leading-none">Find Product</h2>
-            <p className="text-white/55 text-label mt-2 font-medium">Search by Store SKU or Registration</p>
-          </div>
-        </motion.button>
-
-        {/* ── SECONDARY ROW ── */}
-        <div className="grid grid-cols-2 gap-4">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={onInventory}
-            className="card bg-white p-6 flex flex-col items-start gap-4 text-left"
-          >
-            <div className="w-12 h-12 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary">
+      {/* ── METRICS GRID ── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Metric 1 */}
+        <div className="card-premium p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-12 h-12 rounded-full bg-brand-50 text-brand flex items-center justify-center">
               <Package size={22} />
             </div>
-            <div>
-              <h3 className="text-body font-bold text-trust-text leading-none">Inventory</h3>
-              <p className="text-trust-text-muted text-label mt-1 font-medium">Stock & batches</p>
-            </div>
-          </motion.button>
-
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={onAlerts}
-            className="card bg-white p-6 flex flex-col items-start gap-4 text-left relative overflow-hidden"
-          >
             {alertCount > 0 && (
-              <div className="absolute top-5 right-5 bg-warning text-white text-label-sm font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                {alertCount > 9 ? "9+" : alertCount}
-              </div>
+              <span className="badge badge-warning flex items-center gap-1.5 cursor-pointer hover:bg-warning-light/80" onClick={onAlerts}>
+                <AlertTriangle size={14} />
+                {alertCount} Flagged
+              </span>
             )}
-            <div className={`w-12 h-12 rounded-button flex items-center justify-center ${alertCount > 0 ? "bg-warning-light text-warning" : "bg-trust-surface text-trust-text-muted"}`}>
-              <Bell size={22} />
-            </div>
-            <div>
-              <h3 className="text-body font-bold text-trust-text leading-none">Alerts</h3>
-              <p className="text-trust-text-muted text-label mt-1 font-medium">
-                {alertCount > 0 ? `${alertCount} need${alertCount === 1 ? "s" : ""} attention` : "All clear"}
-              </p>
-            </div>
-          </motion.button>
-        </div>
-
-        {/* ── ACTIVITY LOG ── */}
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          onClick={onLogs}
-          className="card-premium w-full bg-brand-dark text-white p-6 flex items-center justify-between mt-1"
-          style={{ borderColor: 'transparent' }}
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 bg-white/10 rounded-button flex items-center justify-center">
-              <History size={20} />
-            </div>
-            <div className="text-left">
-              <h3 className="text-label font-bold text-white leading-none">Activity Log</h3>
-              <p className="text-white/40 text-label-sm mt-1 font-semibold uppercase tracking-wider">Audit Trail & Financials</p>
+          </div>
+          <div>
+            <h3 className="section-label">Active Products</h3>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-heading-xl font-bold text-trust-text">{metrics.activeProducts}</span>
             </div>
           </div>
-          <ArrowRight size={18} className="text-white/30" />
-        </motion.button>
+        </div>
+
+        {/* Metric 2 */}
+        <div className="card-premium p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-12 h-12 rounded-full bg-success-light text-success flex items-center justify-center border border-success-border">
+              <TrendingUp size={22} />
+            </div>
+          </div>
+          <div>
+            <h3 className="section-label">Today&apos;s Sales</h3>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-heading-xl font-bold text-trust-text">{metrics.salesCount}</span>
+              <span className="text-label text-trust-text-muted font-semibold">items sold</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Metric 3 */}
+        <div className="card-premium p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className="w-12 h-12 rounded-full bg-brand-50 text-brand flex items-center justify-center">
+              <DollarSign size={22} />
+            </div>
+          </div>
+          <div>
+            <h3 className="section-label">Today&apos;s Revenue</h3>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-heading-xl font-bold text-trust-text">₦{metrics.todayRevenue.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── QUICK ACTIONS & RECENT ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Quick Actions */}
+        <div className="flex flex-col h-full">
+          <h2 className="text-heading-md font-bold text-trust-text mb-3">Quick Actions</h2>
+          <div className="bg-white border border-trust-border rounded-card p-5 md:p-6 flex flex-col gap-3 md:gap-4 shadow-sm flex-1 justify-center">
+            <p className="text-trust-text-secondary text-xs md:text-label-sm mb-1">Update labels or record a retail sale.</p>
+            <button
+              onClick={onInventory}
+              className="btn-primary w-full py-3.5 md:py-4 text-sm md:text-base"
+            >
+              <ShoppingCart size={18} className="mr-2" />
+              Sell Stock (Retail)
+            </button>
+            <button
+              onClick={onVerify}
+              className="btn-secondary w-full py-3.5 md:py-4 text-sm md:text-base"
+            >
+              <ShieldCheck size={18} className="mr-2" />
+              Add Stock (Bulk)
+            </button>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div>
+          <h2 className="text-heading-md font-bold text-trust-text mb-4">Recent Activity</h2>
+          <div className="bg-white border border-trust-border rounded-card shadow-sm overflow-hidden">
+            <div className="divide-y divide-trust-border-subtle">
+              {recentTxs.length === 0 ? (
+                <div className="p-8 text-center">
+                   <p className="text-label-sm text-trust-text-muted">No recent activity</p>
+                </div>
+              ) : (
+                recentTxs.map((tx) => (
+                  <div key={tx.id} className="p-4 px-6 hover:bg-trust-surface cursor-pointer select-none transition-colors flex justify-between items-center" onClick={onLogs}>
+                    <div>
+                      <p className="text-label font-bold text-trust-text">
+                        {tx.type === "sale" ? "Sold" : tx.type === "restock" ? "Restocked" : "Adjusted"} {Math.abs(tx.quantity)}x {tx.drug_name}
+                      </p>
+                      <p className="text-label-sm text-trust-text-muted mt-0.5">
+                        {new Date(tx.sold_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    {tx.type === "sale" && tx.selling_price && (
+                      <span className="text-label font-bold text-success">+₦{(Math.abs(tx.quantity) * tx.selling_price).toLocaleString()}</span>
+                    )}
+                  </div>
+                ))
+              )}
+              {recentTxs.length > 0 && (
+                <div className="p-4 px-6 bg-trust-surface/50 text-center text-label-sm font-semibold text-brand cursor-pointer hover:bg-brand-50 transition-colors" onClick={onLogs}>
+                  View Full Audit Trail <ArrowRight size={14} className="inline ml-1" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

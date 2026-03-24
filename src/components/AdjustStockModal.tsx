@@ -50,20 +50,20 @@ export default function AdjustStockModal({ item, onClose, onAdjusted }: AdjustSt
   };
 
   return (
-    <>
+    <div className="fixed inset-0 z-50 flex flex-col md:items-center md:justify-center">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
       <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 40 }}
         transition={{ type: "spring", damping: 32, stiffness: 350 }}
-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-modal shadow-elevated max-h-[90vh] overflow-y-auto"
+        className="relative mt-auto md:my-auto bg-white shadow-elevated w-full md:max-w-md rounded-t-modal md:rounded-modal max-h-[90vh] flex flex-col overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-7 pb-4 border-b border-trust-border">
@@ -76,7 +76,7 @@ export default function AdjustStockModal({ item, onClose, onAdjusted }: AdjustSt
           </button>
         </div>
 
-        <div className="p-7 space-y-6">
+        <div className="p-7 space-y-6 overflow-y-auto">
           {/* Reason */}
           <div>
             <span className="section-label block mb-3">Reason for Adjustment</span>
@@ -157,6 +157,6 @@ export default function AdjustStockModal({ item, onClose, onAdjusted }: AdjustSt
           </div>
         </div>
       </motion.div>
-    </>
+    </div>
   );
 }

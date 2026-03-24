@@ -21,6 +21,7 @@ export interface Drug {
 
 export interface InventoryBatch {
   id: string;
+  pharmacy_id: string;
   drug_id: string;
   drug_name: string;
   drug_reg_no: string;
@@ -31,6 +32,7 @@ export interface InventoryBatch {
 
 export interface Transaction {
   id: string;
+  pharmacy_id: string;
   inventory_id: string;
   drug_name: string;
   quantity: number; // Positive for restock, negative for sale

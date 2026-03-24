@@ -60,6 +60,19 @@ body {
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Mobile First Scaling ── */
+@media (max-width: 640px) {
+  :root {
+    --heading-xl: 1.5rem;
+    --heading-lg: 1.25rem;
+    --heading-md: 1.125rem;
+  }
+  .card, .card-premium {
+    border-radius: 12px;
+  }
 }
 
 /* ── Typography Safety ── */

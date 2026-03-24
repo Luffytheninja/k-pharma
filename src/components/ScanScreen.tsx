@@ -2,16 +2,15 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Loader2, Search, Camera } from "lucide-react";
+import { Loader2, Search, Camera } from "lucide-react";
 
 interface ScanScreenProps {
-  onBack: () => void;
   onVerify: (regNo: string) => void;
   isLoading: boolean;
   errorMessage?: string;
 }
 
-export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }: ScanScreenProps) {
+export default function ScanScreen({ onVerify, isLoading, errorMessage }: ScanScreenProps) {
   const [regNo, setRegNo] = useState("");
   const [showSoon, setShowSoon] = useState(false);
 
@@ -21,58 +20,42 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
   };
 
   return (
-    <div className="fixed inset-0 bg-brand-dark z-50 flex flex-col">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-6 pt-14 pb-5 z-10 relative">
-        <button
-          onClick={onBack}
-          className="w-12 h-12 bg-white/10 rounded-button flex items-center justify-center text-white hover:bg-white/15 transition-colors duration-200"
-        >
-          <ArrowLeft size={22} />
-        </button>
-        <div className="text-center">
-          <h2 className="text-white font-bold text-heading-md leading-none">Find Product</h2>
-          <p className="text-white/40 text-label-sm font-semibold uppercase tracking-wider mt-1">
-            Manual SKU Search
-          </p>
+    <div className="flex flex-col h-full bg-trust-surface pt-4 md:pt-12">
+      <div className="flex-1 flex flex-col items-center px-6">
+        <div className="w-20 h-20 bg-brand-50 rounded-card flex items-center justify-center mb-6 shadow-sm border border-trust-border-subtle">
+          <Search size={32} className="text-brand" />
         </div>
-        <button
-          onClick={() => {
-            setShowSoon(true);
-            setTimeout(() => setShowSoon(false), 2000);
-          }}
-          className="w-12 h-12 bg-white/5 rounded-button flex flex-col items-center justify-center text-white/30 relative overflow-hidden hover:bg-white/10 transition-colors duration-200"
-        >
-          <Camera size={20} />
-          {showSoon && (
-            <motion.div 
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-              className="absolute inset-0 bg-brand flex items-center justify-center rounded-button"
-            >
-              <span className="text-label-sm font-bold uppercase leading-none text-white/70">Soon</span>
-            </motion.div>
-          )}
-        </button>
-      </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center px-7">
-        <div className="w-16 h-16 bg-white/8 rounded-card flex items-center justify-center mb-7">
-          <Search size={28} className="text-white/80" />
-        </div>
-        <p className="text-white/55 text-label font-medium mb-7 text-center px-4 leading-relaxed">
-          Enter the Store SKU or Registration ID<br />
-          exactly as printed on the item
+        <p className="text-trust-text-secondary text-body font-medium mb-8 text-center px-4 max-w-md">
+          Enter the Store SKU or Registration ID exactly as printed on the item packaging to verify and stock.
         </p>
-        <input
-          autoFocus
-          type="text"
-          placeholder="e.g. KO-1002 or A4-1234"
-          value={regNo}
-          onChange={(e) => setRegNo(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          className="w-full max-w-sm h-16 bg-white/8 text-white text-xl font-bold text-center rounded-input border-2 border-white/15 focus:border-metallic-light focus:shadow-metallic-glow outline-none placeholder:text-white/20 tracking-wider transition-all duration-200"
-        />
+        <div className="w-full max-w-md relative">
+          <input
+            autoFocus
+            type="text"
+            placeholder="e.g. KO-1002 or A4-1234"
+            value={regNo}
+            onChange={(e) => setRegNo(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            className="w-full h-18 bg-white text-trust-text text-xl font-bold text-center rounded-input border-2 border-trust-border focus:border-brand/40 focus:shadow-sm outline-none placeholder:text-trust-text-muted tracking-wider transition-all duration-200"
+          />
+          <button
+            onClick={() => {
+              setShowSoon(true);
+              setTimeout(() => setShowSoon(false), 2000);
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-trust-text-muted hover:text-brand transition-colors p-2"
+          >
+            <Camera size={24} />
+            {showSoon && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="absolute top-12 right-0 bg-brand text-white px-3 py-1.5 rounded-badge text-label-sm font-bold shadow-elevated whitespace-nowrap"
+              >
+                Camera Soon
+              </motion.div>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Error message */}
@@ -83,20 +66,20 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
       )}
 
       {/* Bottom input area */}
-      <div className="p-7 pb-10 space-y-3">
+      <div className="w-full max-w-md mx-auto p-6 pb-10 space-y-4">
         {isLoading ? (
-          <div className="w-full h-14 bg-white/8 rounded-button flex items-center justify-center gap-3 text-white font-semibold">
-            <Loader2 size={20} className="animate-spin" />
-            Searching registry…
+          <div className="w-full h-16 bg-brand-50 rounded-button flex items-center justify-center gap-3 text-brand font-semibold shadow-sm border border-brand-100">
+            <Loader2 size={24} className="animate-spin" />
+            Searching registry...
           </div>
         ) : (
           <button
             onClick={handleSubmit}
             disabled={!regNo.trim()}
-            className={`w-full transition-all duration-200 active:scale-[0.98] ${
+            className={`w-full transition-all duration-200 ${
               regNo.trim()
                 ? "btn-primary shadow-button-lift"
-                : "h-14 bg-white/8 text-white/35 rounded-button font-semibold"
+                : "h-16 bg-trust-surface border-2 border-trust-border-subtle text-trust-text-muted rounded-button font-bold text-center flex items-center justify-center"
             }`}
           >
             Find Product

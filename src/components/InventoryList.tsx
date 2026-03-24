@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Package, Calendar, ShoppingCart, Plus, Search, AlertTriangle } from "lucide-react";
+import { Package, Calendar, ShoppingCart, Plus, Search, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InventoryItem } from "@/lib/types";
 import QuickSellModal from "./QuickSellModal";
@@ -11,11 +11,11 @@ import AdjustStockModal from "./AdjustStockModal";
 interface InventoryListProps {
   items: InventoryItem[];
   onAddNew: () => void;
-  onBack: () => void;
   onRefresh: () => void;
+  isAdmin?: boolean;
 }
 
-export default function InventoryList({ items, onAddNew, onBack, onRefresh }: InventoryListProps) {
+export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = false }: InventoryListProps) {
   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
   const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
@@ -38,54 +38,40 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
   const alertsCount = filtered.filter(i => i.status !== 'healthy').length;
 
   return (
-    <div className="flex flex-col min-h-screen bg-trust-surface">
-      {/* Header */}
-      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
-        <div className="flex items-center gap-4 mb-5">
-          <button
-            onClick={onBack}
-            className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Active Stock</h1>
-            <p className="text-trust-text-muted text-label font-medium mt-0.5">{items.length} product{items.length !== 1 ? "s" : ""} tracked</p>
+    <div className="flex flex-col min-h-screen bg-trust-surface p-4 md:p-8">
+      {/* Summary Row - Hidden for non-admins */}
+      {isAdmin && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
+          <div className="card p-4 md:p-5 border-trust-border-subtle shadow-sm">
+            <span className="section-label block text-trust-text-secondary">Value (Cost)</span>
+            <p className="text-heading-md font-bold text-trust-text mt-0.5 md:mt-1">₦{totalCost.toLocaleString()}</p>
           </div>
-        </div>
-
-        {/* Summary Row */}
-        <div className="flex gap-3 mb-5 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2 snap-x">
-          <div className="card p-4 min-w-[130px] snap-start">
-            <span className="section-label block">Total Value (Cost)</span>
-            <p className="text-body font-bold text-trust-text mt-1">₦{totalCost.toLocaleString()}</p>
+          <div className="bg-success-light border border-success-border p-4 md:p-5 rounded-card shadow-sm">
+            <span className="section-label text-success block">Profit</span>
+            <p className="text-heading-md font-bold text-success mt-0.5 md:mt-1">₦{potentialProfit.toLocaleString()}</p>
           </div>
-          <div className="bg-success-light border border-success-border p-4 rounded-card min-w-[130px] snap-start">
-            <span className="section-label text-success block">Potential Profit</span>
-            <p className="text-body font-bold text-success mt-1">₦{potentialProfit.toLocaleString()}</p>
-          </div>
-          <div className="bg-warning-light border border-warning-border p-4 rounded-card min-w-[130px] snap-start">
+          <div className="bg-warning-light border border-warning-border p-4 md:p-5 rounded-card shadow-sm">
             <span className="section-label text-warning block">Action Needed</span>
-            <p className="text-body font-bold text-warning mt-1">{alertsCount} flagged</p>
+            <p className="text-heading-md font-bold text-warning mt-0.5 md:mt-1">{alertsCount} flagged</p>
           </div>
         </div>
+      )}
 
-        {/* Search */}
-        <div className="input-icon">
-          <Search size={18} className="icon" />
-          <input
-            type="text"
-            placeholder="Search by name or registration..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input-field"
-            style={{ paddingLeft: '48px', height: '48px' }}
-          />
-        </div>
+      {/* Search */}
+      <div className="input-icon mb-4 md:mb-6">
+        <Search size={18} className="icon" />
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="input-field shadow-sm"
+          style={{ paddingLeft: '48px' }}
+        />
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-7 py-5 pb-28 space-y-4">
+      <div className="flex-1 pb-28 space-y-4 md:space-y-6">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 gap-5 text-trust-text-faint">
             <Package size={48} />
@@ -168,26 +154,31 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
                     </div>
                   </div>
 
-                  {/* Economics Grid */}
-                  <div className="grid grid-cols-2 gap-4 mb-5">
-                    <div className="bg-trust-surface p-4 rounded-card border border-trust-border-subtle">
-                      <span className="section-label block mb-1">Est. Revenue</span>
-                      <p className="text-label font-bold text-trust-text">₦{valCost.toLocaleString()} → ₦{(valCost + valProfit).toLocaleString()}</p>
-                    </div>
-                    <div className="bg-success-light p-4 rounded-card border border-success-border">
-                      <div className="flex justify-between items-baseline">
-                        <span className="section-label text-success block">Margin</span>
-                        <span className="text-label-sm font-bold text-success">{margin}%</span>
+                  {/* Economics Grid - Hidden for non-admins */}
+                  {isAdmin && (
+                    <div className="grid grid-cols-2 gap-4 mb-5">
+                      <div className="bg-trust-surface p-4 rounded-card border border-trust-border-subtle">
+                        <span className="section-label block mb-1">Est. Revenue</span>
+                        <p className="text-label font-bold text-trust-text">₦{valCost.toLocaleString()} → ₦{(valCost + valProfit).toLocaleString()}</p>
                       </div>
-                      <p className="text-label font-bold text-success mt-0.5">+ ₦{valProfit.toLocaleString()}</p>
+                      <div className="bg-success-light p-4 rounded-card border border-success-border">
+                        <div className="flex justify-between items-baseline">
+                          <span className="section-label text-success block">Margin</span>
+                          <span className="text-label-sm font-bold text-success">{margin}%</span>
+                        </div>
+                        <p className="text-label font-bold text-success mt-0.5">+ ₦{valProfit.toLocaleString()}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="flex gap-6">
                     <div>
-                      <span className="section-label block mb-1">Pricing</span>
                       <p className="text-label font-semibold text-trust-text-secondary">
-                         Cost ₦{cost.toLocaleString()} <span className="text-trust-text-faint">|</span> Sell ₦{sell.toLocaleString()}
+                        {isAdmin ? (
+                          <>Cost ₦{cost.toLocaleString()} <span className="text-trust-text-faint">|</span> Sell ₦{sell.toLocaleString()}</>
+                        ) : (
+                          <>Unit Price ₦{sell.toLocaleString()}</>
+                        )}
                       </p>
                     </div>
                     <div>
@@ -201,21 +192,23 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
                 </div>
 
                 {/* Actions */}
-                <div className="border-t border-trust-border-subtle bg-trust-surface/50 px-6 py-4 flex gap-3">
+                <div className="border-t border-trust-border-subtle bg-trust-surface/50 px-6 py-5 flex md:flex-row flex-col gap-4">
                   <button
                     onClick={() => setSellTarget(item)}
-                    className="flex-[2] h-12 bg-white border border-trust-border text-brand font-bold rounded-button flex items-center justify-center gap-2 hover:border-brand/30 active:bg-brand-50 transition-all duration-200 shadow-card"
+                    className="flex-[2] btn-primary w-full"
                   >
-                    <ShoppingCart size={16} />
+                    <ShoppingCart size={18} />
                     Quick Sell
                   </button>
-                  <button
-                    onClick={() => setAdjustTarget(item)}
-                    className="flex-1 h-12 bg-white border border-trust-border-subtle text-trust-text-muted font-semibold rounded-button flex items-center justify-center gap-2 hover:border-warning/30 active:bg-warning-light transition-all duration-200 shadow-card text-label"
-                  >
-                    <AlertTriangle size={14} />
-                    Adjust
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => setAdjustTarget(item)}
+                      className="flex-1 btn-secondary w-full"
+                    >
+                      <AlertTriangle size={16} />
+                      Adjust Stock
+                    </button>
+                  )}
                 </div>
               </motion.div>
             );

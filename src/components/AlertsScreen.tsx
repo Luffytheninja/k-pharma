@@ -3,16 +3,15 @@
 import { useState } from "react";
 
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, Calendar, Package } from "lucide-react";
+import { Check, Calendar, Package } from "lucide-react";
 import { InventoryItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface AlertsScreenProps {
   items: InventoryItem[];
-  onBack: () => void;
 }
 
-export default function AlertsScreen({ items, onBack }: AlertsScreenProps) {
+export default function AlertsScreen({ items }: AlertsScreenProps) {
   const [now] = useState(() => Date.now());
   const alerts = items.filter((i) => i.status !== "healthy");
   const expiring = alerts.filter((i) => i.status === "expiring");
@@ -20,25 +19,9 @@ export default function AlertsScreen({ items, onBack }: AlertsScreenProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-trust-surface">
-      {/* Header */}
-      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Alerts</h1>
-            <p className="text-trust-text-muted text-label font-medium mt-0.5">
-              {alerts.length === 0 ? "All clear — nothing to review" : `${alerts.length} item${alerts.length !== 1 ? "s" : ""} need attention`}
-            </p>
-          </div>
-        </div>
-      </div>
 
-      <div className="flex-1 px-7 py-6 space-y-7">
+
+      <div className="flex-1 px-6 md:px-8 py-6 pb-28 space-y-7">
         {alerts.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}

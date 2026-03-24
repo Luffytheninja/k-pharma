@@ -54,8 +54,8 @@ const config: Config = {
       fontSize: {
         "body": ["16px", { lineHeight: "1.5" }],
         "body-lg": ["18px", { lineHeight: "1.5" }],
-        "label": ["14px", { lineHeight: "1.4", fontWeight: "500" }],
-        "label-sm": ["12px", { lineHeight: "1.3", fontWeight: "600" }],
+        "label": ["15px", { lineHeight: "1.4", fontWeight: "500" }],
+        "label-sm": ["14px", { lineHeight: "1.3", fontWeight: "600" }],
         "heading-xl": ["28px", { lineHeight: "1.2", fontWeight: "700" }],
         "heading-lg": ["22px", { lineHeight: "1.25", fontWeight: "700" }],
         "heading-md": ["18px", { lineHeight: "1.3", fontWeight: "700" }],

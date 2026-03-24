@@ -10,6 +10,7 @@ const KEYS = {
   DRUG_CACHE: "kp_drug_cache",
   PRO_MODE: "kp_pro_mode",
   LOW_STOCK_THRESHOLD: "kp_low_stock",
+  PHARMACY_ID: "kp_pid",
 };
 
 const generateId = () => {
@@ -19,6 +20,16 @@ const generateId = () => {
     return v.toString(16);
   });
 };
+
+// ─── PHARMACY ─────────────────────────────────────────
+export function getPharmacyId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(KEYS.PHARMACY_ID);
+}
+
+export function setPharmacyId(id: string) {
+  localStorage.setItem(KEYS.PHARMACY_ID, id);
+}
 
 // ─── PIN ──────────────────────────────────────────────
 export function getStoredPin(): string | null {
@@ -42,13 +53,15 @@ export function verifyPin(pin: string): boolean {
 // ─── INVENTORY BATCHES ────────────────────────────────
 export function getBatches(): InventoryBatch[] {
   if (typeof window === "undefined") return [];
+  const pharmacyId = getPharmacyId();
   try {
     const raw = localStorage.getItem(KEYS.BATCHES);
     const data = raw ? JSON.parse(raw) : [];
-    // Ensure we only return valid objects with drug_id
-    return Array.isArray(data) ? data.filter((b) => b && b.drug_id) : [];
+    if (!Array.isArray(data)) return [];
+    // Only return batches for the current pharmacy
+    return data.filter((b) => b && b.drug_id && (b.pharmacy_id === pharmacyId || (!b.pharmacy_id && !pharmacyId)));
   } catch {
-    localStorage.removeItem(KEYS.BATCHES); // Heal corrupted state
+    localStorage.removeItem(KEYS.BATCHES); 
     return [];
   }
 }
@@ -61,13 +74,15 @@ export function saveBatches(batches: InventoryBatch[]) {
   }
 }
 
-export function addBatch(batch: Omit<InventoryBatch, "id" | "added_at">): InventoryBatch {
+export function addBatch(batch: Omit<InventoryBatch, "id" | "added_at" | "pharmacy_id">): InventoryBatch {
   const batches = getBatches();
   const cachedDrug = getCachedDrug(batch.drug_id);
+  const pharmacyId = getPharmacyId();
   
   const newBatch: InventoryBatch = {
     ...batch,
     id: generateId(),
+    pharmacy_id: pharmacyId || "local",
     added_at: new Date().toISOString(),
   };
   saveBatches([...batches, newBatch]);
@@ -78,6 +93,7 @@ export function addBatch(batch: Omit<InventoryBatch, "id" | "added_at">): Invent
     drug_name: batch.drug_name,
     quantity: batch.quantity,
     type: "restock",
+    pharmacy_id: pharmacyId || "local",
     cost_price: cachedDrug?.cost_price,
     selling_price: cachedDrug?.selling_price,
     margin: cachedDrug?.selling_price && cachedDrug?.cost_price ? ((cachedDrug.selling_price - cachedDrug.cost_price) / cachedDrug.selling_price) * 100 : 0
@@ -97,6 +113,7 @@ export function sellFromInventory(drug_id: string, quantity: number): { success:
   const totalAvailable = drugBatches.reduce((sum, b) => sum + b.quantity, 0);
   if (quantity > totalAvailable) return { success: false, remaining: totalAvailable };
 
+  const pharmacyId = getPharmacyId();
   let remaining = quantity;
   const updatedBatches = batches.map((b) => {
     if (b.drug_id !== drug_id || remaining === 0) return b;
@@ -113,6 +130,7 @@ export function sellFromInventory(drug_id: string, quantity: number): { success:
     drug_name: drugBatches[0]?.drug_name ?? "",
     quantity: -quantity, // Negative for sale
     type: "sale",
+    pharmacy_id: pharmacyId || "local",
     cost_price: cachedDrug?.cost_price,
     selling_price: cachedDrug?.selling_price,
     margin: cachedDrug?.selling_price && cachedDrug?.cost_price ? ((cachedDrug.selling_price - cachedDrug.cost_price) / cachedDrug.selling_price) * 100 : 0
@@ -131,6 +149,7 @@ export function adjustStock(drug_id: string, quantity: number, reason: string): 
   const totalAvailable = drugBatches.reduce((sum, b) => sum + b.quantity, 0);
   if (quantity > totalAvailable) return { success: false, remaining: totalAvailable };
 
+  const pharmacyId = getPharmacyId();
   let remaining = quantity;
   const updatedBatches = batches.map((b) => {
     if (b.drug_id !== drug_id || remaining === 0) return b;
@@ -147,6 +166,7 @@ export function adjustStock(drug_id: string, quantity: number, reason: string): 
     drug_name: drugBatches[0]?.drug_name ?? "",
     quantity: -quantity,
     type: "adjustment",
+    pharmacy_id: pharmacyId || "local",
     cost_price: cachedDrug?.cost_price,
     selling_price: 0, 
     margin: 0,
@@ -160,10 +180,13 @@ export function adjustStock(drug_id: string, quantity: number, reason: string): 
 // ─── TRANSACTIONS ─────────────────────────────────────
 export function getTransactions(): Transaction[] {
   if (typeof window === "undefined") return [];
+  const pharmacyId = getPharmacyId();
   try {
     const raw = localStorage.getItem(KEYS.TRANSACTIONS);
     const data = raw ? JSON.parse(raw) : [];
-    return Array.isArray(data) ? data : [];
+    if (!Array.isArray(data)) return [];
+    // Only return transactions for the current pharmacy
+    return data.filter(t => t.pharmacy_id === pharmacyId || (!t.pharmacy_id && !pharmacyId));
   } catch {
     localStorage.removeItem(KEYS.TRANSACTIONS);
     return [];
@@ -286,14 +309,16 @@ export function getInventoryItems(): InventoryItem[] {
 // ─── OFFLINE SYNC ENGINE ──────────────────────────────
 export async function syncToCloud() {
   if (typeof window === "undefined" || !navigator.onLine) return;
+  const pharmacyId = getPharmacyId();
+  if (!pharmacyId) return;
 
   try {
-    const batches = getBatches();
+    const batches = getBatches().filter(b => b.pharmacy_id === pharmacyId);
     if (batches.length > 0) {
       await supabase.from("inventory_batches").upsert(batches, { onConflict: "id" });
     }
 
-    const txs = getTransactions();
+    const txs = getTransactions().filter(t => t.pharmacy_id === pharmacyId);
     if (txs.length > 0) {
       await supabase.from("transactions").upsert(txs, { onConflict: "id" });
     }
@@ -315,5 +340,33 @@ export async function syncToCloud() {
     console.log("[K-Pharma] Background sync complete ✅");
   } catch (err) {
     console.error("[K-Pharma] Sync failed:", err);
+  }
+}
+
+export async function syncFromCloud() {
+  if (typeof window === "undefined" || !navigator.onLine) return;
+  const pharmacyId = getPharmacyId();
+  if (!pharmacyId) return;
+
+  try {
+    const { data: batches } = await supabase
+      .from("inventory_batches")
+      .select("*")
+      .eq("pharmacy_id", pharmacyId);
+    
+    if (batches) saveBatches(batches);
+
+    const { data: txs } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("pharmacy_id", pharmacyId);
+    
+    if (txs) {
+      localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(txs));
+    }
+    
+    console.log("[K-Pharma] Background pull complete ✅");
+  } catch (err) {
+    console.error("[K-Pharma] Pull failed:", err);
   }
 }
