@@ -1,0 +1,2658 @@
+﻿diff --git a/src/app/globals.css b/src/app/globals.css
+index 6d49104..a3839fc 100644
+--- a/src/app/globals.css
++++ b/src/app/globals.css
+@@ -2,11 +2,48 @@
+ @tailwind components;
+ @tailwind utilities;
+ 
++/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
++/* KO-Mart ┬╖ "Modern Trust" Design System          */
++/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
++
++@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
++
+ :root {
+-  --font-sans: "Inter", system-ui, sans-serif;
++  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
++
++  /* Brand Palette */
++  --brand: #1B3A4B;
++  --brand-light: #264653;
++  --brand-dark: #122A36;
++
++  /* Surfaces */
++  --surface: #F5F6F8;
++  --card: #FFFFFF;
++  --border: #E2E5EA;
++  --border-subtle: #ECEEF2;
++
++  /* Text Hierarchy */
++  --text-primary: #1E293B;
++  --text-secondary: #64748B;
++  --text-muted: #94A3B8;
++  --text-faint: #CBD5E1;
++
++  /* Status */
++  --success: #16A34A;
++  --warning: #D97706;
++  --danger: #DC2626;
++
++  /* Metallic Accent */
++  --metallic-light: #C0C0C0;
++  --metallic-dark: #8A8A8A;
++  --metallic-gradient: linear-gradient(135deg, #C0C0C0, #9A9A9A, #C0C0C0);
++
++  /* Transitions */
++  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
++  --duration: 180ms;
+ }
+ 
+-/* Base resets for mobile-first pharmacy tool */
++/* ΓöÇΓöÇ Base Resets ΓöÇΓöÇ */
+ html {
+   height: 100%;
+   overflow: hidden;
+@@ -15,31 +52,325 @@ html {
+ body {
+   height: 100%;
+   overflow: hidden;
+-  background-color: #f8f9fa;
+-  color: #1a1a1a;
++  background-color: var(--surface);
++  color: var(--text-primary);
++  font-family: var(--font-sans);
++  font-size: 16px;
++  line-height: 1.5;
+   -webkit-tap-highlight-color: transparent;
+   -webkit-font-smoothing: antialiased;
++  -moz-osx-font-smoothing: grayscale;
++}
++
++/* ΓöÇΓöÇ Typography Safety ΓöÇΓöÇ */
++* {
++  font-size: max(14px, 1em);
+ }
+ 
+-/* Thumb-friendly minimum tap target */
+-button {
+-  min-height: 44px;
++/* ΓöÇΓöÇ Minimum Tap Target (Accessibility) ΓöÇΓöÇ */
++button, [role="button"] {
++  min-height: 48px;
+   cursor: pointer;
+ }
+ 
+-/* Scrollable containers only */
++/* ΓöÇΓöÇ Scrollable Containers ΓöÇΓöÇ */
+ .scroll-area {
+   height: 100%;
+   overflow-y: auto;
+   -webkit-overflow-scrolling: touch;
+ }
+ 
+-/* No text below 14px anywhere */
+-* {
+-  font-size: max(14px, 1em);
++/* ΓöÇΓöÇ Hide Scrollbar Utility ΓöÇΓöÇ */
++.hide-scrollbar::-webkit-scrollbar { display: none; }
++.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
++
++/* ΓòÉΓòÉΓòÉ BUTTON SYSTEM ΓòÉΓòÉΓòÉ */
++
++/* Primary Button ΓÇö Deep brand bg + metallic stroke */
++.btn-primary {
++  position: relative;
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 8px;
++  height: 56px;
++  padding: 0 24px;
++  background: var(--brand);
++  color: white;
++  font-weight: 700;
++  font-size: 16px;
++  border-radius: 12px;
++  border: 1.5px solid transparent;
++  background-clip: padding-box;
++  box-shadow:
++    0 1px 2px rgba(27,58,75,0.08),
++    0 0 0 1px rgba(192,192,192,0.2);
++  transition: all var(--duration) var(--ease-out);
++}
++
++.btn-primary::before {
++  content: '';
++  position: absolute;
++  inset: -1.5px;
++  border-radius: 13.5px;
++  background: var(--metallic-gradient);
++  z-index: -1;
++  opacity: 0.4;
++  transition: opacity var(--duration) var(--ease-out);
++}
++
++.btn-primary:hover {
++  box-shadow:
++    0 4px 14px -2px rgba(27,58,75,0.25),
++    0 0 0 1px rgba(192,192,192,0.4);
++  transform: translateY(-1px);
++}
++
++.btn-primary:hover::before {
++  opacity: 0.7;
++}
++
++.btn-primary:active {
++  transform: translateY(0);
++  box-shadow: inset 0 2px 4px rgba(0,0,0,0.12);
++}
++
++.btn-primary:active::before {
++  opacity: 0.2;
++}
++
++.btn-primary:disabled {
++  opacity: 0.5;
++  pointer-events: none;
++}
++
++/* Secondary Button ΓÇö Outline only, no metallic */
++.btn-secondary {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 8px;
++  height: 56px;
++  padding: 0 24px;
++  background: transparent;
++  color: var(--text-secondary);
++  font-weight: 600;
++  font-size: 16px;
++  border-radius: 12px;
++  border: 1.5px solid var(--border);
++  transition: all var(--duration) var(--ease-out);
++}
++
++.btn-secondary:hover {
++  border-color: var(--text-muted);
++  color: var(--text-primary);
++  background: rgba(0,0,0,0.02);
++}
++
++.btn-secondary:active {
++  background: rgba(0,0,0,0.04);
++  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
++}
++
++/* Ghost Button */
++.btn-ghost {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 6px;
++  height: 48px;
++  padding: 0 16px;
++  background: transparent;
++  color: var(--text-secondary);
++  font-weight: 600;
++  font-size: 15px;
++  border-radius: 12px;
++  border: none;
++  transition: all var(--duration) var(--ease-out);
++}
++
++.btn-ghost:hover {
++  background: rgba(0,0,0,0.04);
++  color: var(--text-primary);
++}
++
++/* Danger Button */
++.btn-danger {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  gap: 8px;
++  height: 56px;
++  padding: 0 24px;
++  background: var(--danger);
++  color: white;
++  font-weight: 700;
++  font-size: 16px;
++  border-radius: 12px;
++  border: none;
++  box-shadow: 0 2px 8px -2px rgba(220,38,38,0.3);
++  transition: all var(--duration) var(--ease-out);
++}
++
++.btn-danger:hover {
++  box-shadow: 0 4px 12px -2px rgba(220,38,38,0.35);
++  transform: translateY(-1px);
++}
++
++.btn-danger:active {
++  transform: translateY(0);
++  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+ }
+ 
+-/* Override for tiny labels intentionally sized down */
++/* ΓòÉΓòÉΓòÉ CARD SYSTEM ΓòÉΓòÉΓòÉ */
++
++.card {
++  background: var(--card);
++  border: 1px solid var(--border-subtle);
++  border-radius: 16px;
++  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.03);
++  transition: box-shadow var(--duration) var(--ease-out);
++}
++
++.card:hover {
++  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
++}
++
++/* Premium card with metallic top trim */
++.card-premium {
++  background: var(--card);
++  border: 1px solid var(--border-subtle);
++  border-radius: 16px;
++  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.03);
++  position: relative;
++  overflow: hidden;
++}
++
++.card-premium::before {
++  content: '';
++  position: absolute;
++  top: 0;
++  left: 0;
++  right: 0;
++  height: 2px;
++  background: var(--metallic-gradient);
++  opacity: 0.6;
++}
++
++/* ΓòÉΓòÉΓòÉ INPUT SYSTEM ΓòÉΓòÉΓòÉ */
++
++.input-field {
++  width: 100%;
++  height: 56px;
++  padding: 0 16px;
++  background: var(--surface);
++  border: 1.5px solid var(--border);
++  border-radius: 12px;
++  font-size: 16px;
++  font-weight: 500;
++  color: var(--text-primary);
++  transition: all var(--duration) var(--ease-out);
++  outline: none;
++}
++
++.input-field::placeholder {
++  color: var(--text-faint);
++  font-weight: 400;
++}
++
++.input-field:focus {
++  border-color: var(--brand);
++  box-shadow: 0 0 0 3px rgba(27,58,75,0.08);
++  background: white;
++}
++
++.input-field:disabled {
++  opacity: 0.5;
++  cursor: not-allowed;
++}
++
++/* Input with icon */
++.input-icon {
++  position: relative;
++}
++
++.input-icon .icon {
++  position: absolute;
++  left: 16px;
++  top: 50%;
++  transform: translateY(-50%);
++  color: var(--text-muted);
++  pointer-events: none;
++  transition: color var(--duration) var(--ease-out);
++}
++
++.input-icon .input-field {
++  padding-left: 48px;
++}
++
++.input-icon:focus-within .icon {
++  color: var(--brand);
++}
++
++/* ΓòÉΓòÉΓòÉ STATUS BADGES ΓòÉΓòÉΓòÉ */
++
++.badge {
++  display: inline-flex;
++  align-items: center;
++  gap: 4px;
++  padding: 4px 10px;
++  font-size: 12px;
++  font-weight: 600;
++  border-radius: 8px;
++  border: 1px solid transparent;
++  white-space: nowrap;
++}
++
++.badge-success {
++  background: #F0FDF4;
++  color: #16A34A;
++  border-color: #BBF7D0;
++}
++
++.badge-warning {
++  background: #FFFBEB;
++  color: #D97706;
++  border-color: #FDE68A;
++}
++
++.badge-danger {
++  background: #FEF2F2;
++  color: #DC2626;
++  border-color: #FECACA;
++}
++
++.badge-neutral {
++  background: #F1F5F9;
++  color: #64748B;
++  border-color: #E2E8F0;
++}
++
++/* ΓòÉΓòÉΓòÉ SECTION HEADERS ΓòÉΓòÉΓòÉ */
++
++.section-label {
++  font-size: 12px;
++  font-weight: 600;
++  color: var(--text-muted);
++  text-transform: uppercase;
++  letter-spacing: 0.05em;
++}
++
++/* ΓòÉΓòÉΓòÉ UTILITY ΓòÉΓòÉΓòÉ */
++
++/* Override for small labels explicitly sized */
+ .label-xs {
+   font-size: 11px !important;
+ }
++
++/* Metallic divider */
++.divider-metallic {
++  height: 1px;
++  background: var(--metallic-gradient);
++  opacity: 0.25;
++  border: none;
++}
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index 44a4b6c..e10e557 100644
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -130,8 +130,8 @@ export default function Home() {
+       // Cache locally
+       cacheDrug(drug);
+       setVerifiedDrug(drug);
+-    } catch (err: any) {
+-      if (err.name === "AbortError") {
++    } catch (err: unknown) {
++      if (err instanceof DOMException && err.name === "AbortError") {
+         setVerifyError("Taking longer than usualΓÇª Check your connection and try again.");
+       } else if (!isOnline) {
+         const cached = getCachedDrug(regNo);
+@@ -167,7 +167,7 @@ export default function Home() {
+   }
+ 
+   return (
+-    <div className="fixed inset-0 overflow-hidden bg-[#f8f9fa]">
++    <div className="fixed inset-0 overflow-hidden bg-trust-surface">
+       <AnimatePresence mode="wait">
+         {view === "dashboard" && (
+           <motion.div
+diff --git a/src/components/ActivityLog.tsx b/src/components/ActivityLog.tsx
+index 8b8261a..9462c23 100644
+--- a/src/components/ActivityLog.tsx
++++ b/src/components/ActivityLog.tsx
+@@ -55,95 +55,96 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
+     const url = window.URL.createObjectURL(blob);
+     const a = document.createElement("a");
+     a.href = url;
+-    a.download = `k-pharma-log-${new Date().toISOString().split('T')[0]}.csv`;
++    a.download = `ko-mart-log-${new Date().toISOString().split('T')[0]}.csv`;
+     a.click();
+   };
+ 
+   return (
+-    <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
++    <div className="flex flex-col min-h-screen bg-trust-surface">
+       {/* Header */}
+-      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-6 sticky top-0 z-10 shadow-sm">
+-        <div className="flex items-center justify-between mb-4">
++      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
++        <div className="flex items-center justify-between mb-5">
+           <div className="flex items-center gap-4">
+-            <button onClick={onBack} className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500">
++            <button onClick={onBack} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
+               <ArrowLeft size={20} />
+             </button>
+             <div>
+-              <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Activity Log</h1>
+-              <p className="text-slate-400 text-xs font-medium">Audit Trail &amp; Ledger</p>
++              <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Activity Log</h1>
++              <p className="text-trust-text-muted text-label font-medium mt-0.5">Audit Trail & Ledger</p>
+             </div>
+           </div>
+           <div className="flex gap-2">
+-            <button onClick={handleExport} className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-[#004d40]">
++            <button onClick={handleExport} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-brand hover:bg-brand-50 transition-colors duration-200">
+               <Download size={20} />
+             </button>
+-            <button onClick={() => setShowConfirmReset(true)} className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-500">
++            <button onClick={() => setShowConfirmReset(true)} className="w-11 h-11 bg-danger-light rounded-button flex items-center justify-center text-danger hover:bg-danger/10 transition-colors duration-200">
+               <Trash2 size={20} />
+             </button>
+           </div>
+         </div>
+ 
+         {/* Quick Summary */}
+-        <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-2 px-2">
+-          <div className="bg-[#004d40] text-white px-4 py-3 rounded-2xl min-w-[140px] shadow-lg shadow-[#004d40]/20">
+-            <span className="text-[9px] uppercase font-black text-white/60 tracking-wider">Revenue (Logged)</span>
+-            <p className="text-lg font-black mt-0.5">Γéª{stats.totalRevenue.toLocaleString()}</p>
++        <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-2 px-2 mb-5">
++          <div className="card-premium bg-brand text-white px-5 py-4 min-w-[150px] shadow-elevated" style={{ borderColor: 'transparent' }}>
++            <span className="section-label text-white/60 block">Revenue (Logged)</span>
++            <p className="text-body-lg font-bold mt-1">Γéª{stats.totalRevenue.toLocaleString()}</p>
+           </div>
+-          <div className="bg-white border border-slate-100 px-4 py-3 rounded-2xl min-w-[120px]">
+-            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Total Sales</span>
+-            <p className="text-lg font-black text-slate-800 mt-0.5">{stats.salesCount}</p>
++          <div className="card px-5 py-4 min-w-[130px]">
++            <span className="section-label block">Total Sales</span>
++            <p className="text-body-lg font-bold text-trust-text mt-1">{stats.salesCount}</p>
+           </div>
+-          <div className="bg-white border border-slate-100 px-4 py-3 rounded-2xl min-w-[120px]">
+-            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Restocks</span>
+-            <p className="text-lg font-black text-slate-800 mt-0.5">{stats.totalRestock}</p>
++          <div className="card px-5 py-4 min-w-[130px]">
++            <span className="section-label block">Restocks</span>
++            <p className="text-body-lg font-bold text-trust-text mt-1">{stats.totalRestock}</p>
+           </div>
+         </div>
+ 
+-        <div className="mt-4 relative">
+-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
++        <div className="input-icon">
++          <Search size={18} className="icon" />
+           <input
+             type="text"
+             placeholder="Search log..."
+             value={search}
+             onChange={(e) => setSearch(e.target.value)}
+-            className="w-full h-11 bg-slate-50 rounded-xl pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#004d40]/10 border border-slate-100"
++            className="input-field"
++            style={{ paddingLeft: '48px', height: '48px' }}
+           />
+         </div>
+       </div>
+ 
+       {/* List */}
+-      <div className="flex-1 p-6 space-y-3">
++      <div className="flex-1 p-7 space-y-3">
+         {filtered.length === 0 ? (
+-          <div className="flex flex-col items-center justify-center h-64 gap-3 text-slate-300">
+-            <History size={48} />
+-            <p className="font-bold text-sm">No activity recorded yet</p>
++          <div className="flex flex-col items-center justify-center h-64 gap-4 text-trust-text-faint">
++            <History size={44} />
++            <p className="font-semibold text-label text-trust-text-muted">No activity recorded yet</p>
+           </div>
+         ) : (
+           filtered.map((tx) => (
+-            <div key={tx.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center gap-4">
++            <div key={tx.id} className="card p-5 flex items-center gap-4">
+               <div className={cn(
+-                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+-                tx.type === "sale" ? "bg-green-50 text-green-600" : "bg-blue-50 text-blue-600"
++                "w-12 h-12 rounded-button flex items-center justify-center shrink-0",
++                tx.type === "sale" ? "bg-success-light text-success" : "bg-blue-50 text-blue-600"
+               )}>
+                 {tx.type === "sale" ? <TrendingDown size={22} /> : <TrendingUp size={22} />}
+               </div>
+               <div className="flex-1 min-w-0">
+                 <div className="flex justify-between items-start">
+-                  <h4 className="font-black text-slate-800 text-sm truncate">{tx.drug_name}</h4>
++                  <h4 className="font-bold text-trust-text text-label truncate">{tx.drug_name}</h4>
+                   <span className={cn(
+-                    "text-[10px] font-black uppercase px-2 py-0.5 rounded-md",
+-                    tx.type === "sale" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
++                    "badge ml-2",
++                    tx.type === "sale" ? "badge-success" : "badge-neutral"
+                   )}>
+                     {tx.type}
+                   </span>
+                 </div>
+-                <div className="flex items-center justify-between mt-1">
+-                  <p className="text-xs font-bold text-slate-500 tracking-tight">
++                <div className="flex items-center justify-between mt-1.5">
++                  <p className="text-label font-semibold text-trust-text-secondary tracking-tight">
+                     {tx.quantity > 0 ? "+" : ""}{tx.quantity} units 
+                     {tx.selling_price && ` ┬╖ Γéª${(Math.abs(tx.quantity)*tx.selling_price).toLocaleString()}`}
+                   </p>
+-                  <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold">
+-                    <Calendar size={10} />
++                  <div className="flex items-center gap-1.5 text-label-sm text-trust-text-muted font-semibold">
++                    <Calendar size={12} />
+                     {new Date(tx.sold_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                   </div>
+                 </div>
+@@ -155,30 +156,31 @@ export default function ActivityLog({ onBack }: ActivityLogProps) {
+ 
+       {/* Reset Confirmation */}
+       {showConfirmReset && (
+-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
++        <div className="fixed inset-0 z-[100] flex items-center justify-center p-7">
++          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowConfirmReset(false)} />
+           <motion.div 
+-            initial={{ scale: 0.9, opacity: 0 }}
++            initial={{ scale: 0.95, opacity: 0 }}
+             animate={{ scale: 1, opacity: 1 }}
+-            className="bg-white rounded-[32px] p-8 w-full max-w-sm relative z-10 text-center shadow-2xl"
++            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
++            className="bg-white rounded-modal p-8 w-full max-w-sm relative z-10 text-center shadow-elevated"
+           >
+-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+-              <Trash2 size={32} />
++            <div className="w-16 h-16 bg-danger-light border border-danger-border text-danger rounded-card flex items-center justify-center mx-auto mb-6">
++              <Trash2 size={28} />
+             </div>
+-            <h3 className="text-xl font-black text-slate-800 mb-2 font-display">Factory Reset?</h3>
+-            <p className="text-slate-500 text-sm font-medium mb-8">
++            <h3 className="text-heading-lg font-bold text-trust-text mb-3">Factory Reset?</h3>
++            <p className="text-trust-text-secondary text-label font-medium mb-8 leading-relaxed">
+               This will permanently delete all inventory, logs, and settings. This cannot be undone.
+             </p>
+             <div className="flex flex-col gap-3">
+               <button 
+                 onClick={purgeAllAppData}
+-                className="h-14 bg-red-500 text-white rounded-2xl font-black text-base shadow-lg shadow-red-500/30"
++                className="btn-danger w-full"
+               >
+                 CLEAR EVERYTHING
+               </button>
+               <button 
+                 onClick={() => setShowConfirmReset(false)}
+-                className="h-14 bg-slate-100 text-slate-500 rounded-2xl font-bold text-base"
++                className="btn-secondary w-full"
+               >
+                 Cancel
+               </button>
+diff --git a/src/components/AddToStockModal.tsx b/src/components/AddToStockModal.tsx
+index 623e6ac..6530d08 100644
+--- a/src/components/AddToStockModal.tsx
++++ b/src/components/AddToStockModal.tsx
+@@ -1,10 +1,10 @@
+ "use client";
+ 
+-import { useState } from "react";
++import { useState, useEffect } from "react";
+ import { motion } from "framer-motion";
+-import { X, Package } from "lucide-react";
++import { Plus, X, Calendar, DollarSign, Package, AlertTriangle, TrendingUp, Loader2 } from "lucide-react";
+ import { Drug } from "@/lib/types";
+-import { addBatch, cacheDrug } from "@/lib/store";
++import { addBatch, getCachedDrug, cacheDrug } from "@/lib/store";
+ 
+ interface AddToStockModalProps {
+   drug: Drug;
+@@ -14,130 +14,212 @@ interface AddToStockModalProps {
+ 
+ export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockModalProps) {
+   const [quantity, setQuantity] = useState("");
+-  const [expiryDate, setExpiryDate] = useState("");
+-  const [costPrice, setCostPrice] = useState(drug.cost_price ? String(drug.cost_price) : "");
+-  const [sellingPrice, setSellingPrice] = useState(drug.selling_price ? String(drug.selling_price) : "");
+-  const [reorderPoint, setReorderPoint] = useState(drug.reorder_point ? String(drug.reorder_point) : "10");
+-  const [avgDailyUsage, setAvgDailyUsage] = useState(drug.avg_daily_usage ? String(drug.avg_daily_usage) : "1");
+-  
++  const [expiry, setExpiry] = useState("");
++  const [costPrice, setCostPrice] = useState("");
++  const [sellingPrice, setSellingPrice] = useState("");
++  const [reorderPoint, setReorderPoint] = useState("");
++  const [avgDailyUsage, setAvgDailyUsage] = useState("");
++  const [loading, setLoading] = useState(false);
+   const [error, setError] = useState("");
+ 
+-  const handleSave = () => {
+-    const qty = parseInt(quantity, 10);
+-    if (!qty || qty <= 0) { setError("Enter a valid quantity"); return; }
+-    if (!expiryDate) { setError("Expiry date is required"); return; }
+-    
+-    const exDateObj = new Date(expiryDate);
+-    if (isNaN(exDateObj.getTime())) { setError("Please enter a valid date"); return; }
+-
+-    const cost = parseFloat(costPrice) || 0;
+-    const sell = parseFloat(sellingPrice) || 0;
+-    const reorder = parseInt(reorderPoint, 10) || 10;
+-    const usage = parseInt(avgDailyUsage, 10) || 1;
+-
+-    // 1. Log the individual batch tracking
+-    addBatch({
+-      drug_id: drug.nafdac_number,
+-      drug_name: drug.name,
+-      drug_reg_no: drug.nafdac_number,
+-      quantity: qty,
+-      expiry_date: expiryDate,
+-    });
+-
+-    // 2. Globally update the drug profile with new pricing / settings
+-    cacheDrug({
+-      ...drug,
+-      cost_price: cost,
+-      selling_price: sell,
+-      reorder_point: reorder,
+-      avg_daily_usage: usage,
+-    });
+-
+-    onAdded();
++  useEffect(() => {
++    const existing = getCachedDrug(drug.nafdac_number);
++    if (existing) {
++      setCostPrice(existing.cost_price?.toString() || "");
++      setSellingPrice(existing.selling_price?.toString() || "");
++      setReorderPoint(existing.reorder_point?.toString() || "10");
++      setAvgDailyUsage(existing.avg_daily_usage?.toString() || "1");
++    }
++  }, [drug.nafdac_number]);
++
++  const handleAdd = async () => {
++    if (!quantity || parseInt(quantity) <= 0) {
++      setError("Enter a valid quantity");
++      return;
++    }
++    setLoading(true);
++    setError("");
++    try {
++      // Cache pricing data on the Drug object
++      cacheDrug({
++        ...drug,
++        nafdac_number: drug.nafdac_number,
++        name: drug.name || "Unknown Product",
++        manufacturer: drug.manufacturer || "",
++        status: drug.status,
++        cost_price: costPrice ? parseFloat(costPrice) : undefined,
++        selling_price: sellingPrice ? parseFloat(sellingPrice) : undefined,
++        reorder_point: reorderPoint ? parseInt(reorderPoint) : 10,
++        avg_daily_usage: avgDailyUsage ? parseFloat(avgDailyUsage) : 1,
++      });
++
++      // Add batch with only InventoryBatch-compatible fields
++      addBatch({
++        drug_id: drug.nafdac_number,
++        drug_name: drug.name || "Unknown Product",
++        drug_reg_no: drug.nafdac_number,
++        quantity: parseInt(quantity),
++        expiry_date: expiry || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
++      });
++      onAdded();
++    } catch (e: unknown) {
++      const msg = e instanceof Error ? e.message : "Failed to add stock";
++      setError(msg);
++    } finally {
++      setLoading(false);
++    }
+   };
+ 
+-  const tomorrow = new Date();
+-  tomorrow.setDate(tomorrow.getDate() + 1);
+-  const minDate = tomorrow.toISOString().split("T")[0];
+-
+   return (
+     <>
+       <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 1 }}
+-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
++        exit={{ opacity: 0 }}
++        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+         onClick={onClose}
+       />
+       <motion.div
+         initial={{ y: "100%" }}
+         animate={{ y: 0 }}
+-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+-        className="fixed bottom-0 left-0 right-0 z-[10000] bg-white rounded-t-[32px] shadow-2xl max-h-[90vh] overflow-y-auto"
++        exit={{ y: "100%" }}
++        transition={{ type: "spring", damping: 32, stiffness: 350 }}
++        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-modal shadow-elevated max-h-[90vh] overflow-y-auto"
+       >
+-        <div className="p-6">
+-          <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6" />
++        {/* Header */}
++        <div className="flex items-center justify-between p-7 pb-4 border-b border-trust-border">
++          <div>
++            <h2 className="text-heading-md font-bold text-trust-text tracking-tight">Add to Stock</h2>
++            <p className="text-trust-text-muted text-label font-medium mt-0.5">{drug.name || drug.nafdac_number}</p>
++          </div>
++          <button onClick={onClose} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
++            <X size={20} />
++          </button>
++        </div>
+ 
+-          <div className="flex items-center justify-between mb-6">
+-            <div className="flex items-center gap-3">
+-              <div className="w-10 h-10 bg-[#004d40]/10 rounded-xl flex items-center justify-center">
+-                <Package size={20} className="text-[#004d40]" />
+-              </div>
+-              <div>
+-                <h3 className="font-black text-slate-800 text-base leading-none">Add to Stock</h3>
+-                <p className="text-slate-400 text-xs mt-0.5 truncate max-w-[200px]">{drug.name}</p>
+-              </div>
++        <div className="p-7 space-y-5">
++          {/* Quantity */}
++          <div>
++            <label className="section-label block mb-2">Quantity *</label>
++            <div className="input-icon">
++              <Package className="icon" size={18} />
++              <input
++                type="number"
++                min="1"
++                placeholder="Number of units"
++                value={quantity}
++                onChange={(e) => setQuantity(e.target.value)}
++                className="input-field"
++                style={{ paddingLeft: '48px' }}
++              />
+             </div>
+-            <button onClick={onClose} className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
+-              <X size={20} />
+-            </button>
+           </div>
+ 
+-          <div className="flex flex-col gap-4">
+-            {/* Batch Level inputs */}
+-            <div className="grid grid-cols-2 gap-4">
+-              <div>
+-                <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">Qty Received</label>
+-                <input type="number" inputMode="numeric" placeholder="0" value={quantity} onChange={(e) => { setQuantity(e.target.value); setError(""); }} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-lg font-bold focus:outline-none focus:border-[#004d40]" />
+-              </div>
+-              <div>
+-                <label className="text-xs font-black text-slate-500 uppercase tracking-wider block mb-2">Expiry Date</label>
+-                <input type="date" min={minDate} value={expiryDate} onChange={(e) => { setExpiryDate(e.target.value); setError(""); }} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-sm font-bold focus:outline-none focus:border-[#004d40]" />
+-              </div>
++          {/* Expiry */}
++          <div>
++            <label className="section-label block mb-2">Expiry Date</label>
++            <div className="input-icon">
++              <Calendar className="icon" size={18} />
++              <input
++                type="date"
++                value={expiry}
++                onChange={(e) => setExpiry(e.target.value)}
++                className="input-field"
++                style={{ paddingLeft: '48px' }}
++              />
+             </div>
++          </div>
+ 
+-            <div className="h-px bg-slate-100 my-2" />
+-
+-            {/* Economics & Thresholds */}
+-            <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider">Product Economics (Global)</p>
+-            <div className="grid grid-cols-2 gap-4">
+-              <div>
+-                <label className="text-xs font-black text-slate-500 block mb-1">Cost Price (Γéª)</label>
+-                <input type="number" inputMode="numeric" placeholder="0" value={costPrice} onChange={(e) => setCostPrice(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
+-              </div>
+-              <div>
+-                <label className="text-xs font-black text-slate-500 block mb-1">Selling Price (Γéª)</label>
+-                <input type="number" inputMode="numeric" placeholder="0" value={sellingPrice} onChange={(e) => setSellingPrice(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
++          {/* Pricing Row */}
++          <div className="grid grid-cols-2 gap-4">
++            <div>
++              <label className="section-label block mb-2">Cost Price (Γéª)</label>
++              <div className="input-icon">
++                <DollarSign className="icon" size={18} />
++                <input
++                  type="number"
++                  placeholder="0"
++                  value={costPrice}
++                  onChange={(e) => setCostPrice(e.target.value)}
++                  className="input-field"
++                  style={{ paddingLeft: '48px' }}
++                />
+               </div>
+             </div>
+-            <div className="grid grid-cols-2 gap-4 mt-2">
+-              <div>
+-                <label className="text-xs font-black text-slate-500 block mb-1">Reorder Point</label>
+-                <input type="number" inputMode="numeric" placeholder="10" value={reorderPoint} onChange={(e) => setReorderPoint(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
+-              </div>
+-              <div>
+-                <label className="text-xs font-black text-slate-500 block mb-1">Daily Usage (Avg)</label>
+-                <input type="number" inputMode="numeric" placeholder="1" value={avgDailyUsage} onChange={(e) => setAvgDailyUsage(e.target.value)} className="w-full h-14 bg-slate-50 border border-slate-200 rounded-xl px-4 text-base font-bold focus:outline-none focus:border-[#004d40]" />
++            <div>
++              <label className="section-label block mb-2">Sell Price (Γéª)</label>
++              <div className="input-icon">
++                <TrendingUp className="icon" size={18} />
++                <input
++                  type="number"
++                  placeholder="0"
++                  value={sellingPrice}
++                  onChange={(e) => setSellingPrice(e.target.value)}
++                  className="input-field"
++                  style={{ paddingLeft: '48px' }}
++                />
+               </div>
+             </div>
++          </div>
+ 
+-            {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
++          {/* Reorder & Usage */}
++          <div className="grid grid-cols-2 gap-4">
++            <div>
++              <label className="section-label block mb-2">Reorder Point</label>
++              <div className="input-icon">
++                <AlertTriangle className="icon" size={18} />
++                <input
++                  type="number"
++                  placeholder="10"
++                  value={reorderPoint}
++                  onChange={(e) => setReorderPoint(e.target.value)}
++                  className="input-field"
++                  style={{ paddingLeft: '48px' }}
++                />
++              </div>
++            </div>
++            <div>
++              <label className="section-label block mb-2">Avg Daily Use</label>
++              <input
++                type="number"
++                step="0.1"
++                placeholder="1"
++                value={avgDailyUsage}
++                onChange={(e) => setAvgDailyUsage(e.target.value)}
++                className="input-field"
++              />
++            </div>
++          </div>
+ 
+-            <button onClick={handleSave} className="w-full h-14 bg-[#004d40] text-white rounded-2xl font-bold text-base mt-2 shadow-lg shadow-[#004d40]/20 active:scale-[0.98] transition-transform">
+-              Save Batch
++          {/* Error */}
++          {error && (
++            <div className="text-danger text-label font-semibold bg-danger-light p-4 rounded-card border border-danger-border">
++              {error}
++            </div>
++          )}
++
++          {/* Actions */}
++          <div className="flex flex-col gap-3 pt-2">
++            <button
++              onClick={handleAdd}
++              disabled={loading}
++              className="btn-primary w-full"
++            >
++              {loading ? <Loader2 size={20} className="animate-spin" /> : (
++                <>
++                  <Plus size={20} />
++                  Confirm & Add
++                </>
++              )}
++            </button>
++            <button
++              onClick={onClose}
++              className="btn-secondary w-full"
++            >
++              Cancel
+             </button>
+           </div>
+         </div>
+-        <div className="h-6" />
+       </motion.div>
+     </>
+   );
+diff --git a/src/components/AdjustStockModal.tsx b/src/components/AdjustStockModal.tsx
+index 9f371f2..1bb2be9 100644
+--- a/src/components/AdjustStockModal.tsx
++++ b/src/components/AdjustStockModal.tsx
+@@ -1,8 +1,8 @@
+ "use client";
+ 
+ import { useState } from "react";
+-import { motion, AnimatePresence } from "framer-motion";
+-import { X, AlertTriangle, CheckCircle2 } from "lucide-react";
++import { motion } from "framer-motion";
++import { AlertTriangle, X, Minus, Plus, Loader2 } from "lucide-react";
+ import { InventoryItem } from "@/lib/types";
+ import { adjustStock } from "@/lib/store";
+ import { cn } from "@/lib/utils";
+@@ -10,166 +10,153 @@ import { cn } from "@/lib/utils";
+ interface AdjustStockModalProps {
+   item: InventoryItem;
+   onClose: () => void;
+-  onAdjusted: (remaining: number) => void;
++  onAdjusted: () => void;
+ }
+ 
+ const REASONS = [
+-  { id: "damage", label: "Damaged / Broken", icon: "≡ƒÆÑ" },
+-  { id: "expiry", label: "Expired", icon: "≡ƒôà" },
+-  { id: "returns", label: "Return to Supplier", icon: "≡ƒôª" },
+-  { id: "lost", label: "Theft / Lost", icon: "≡ƒò╡∩╕Å" },
+-  { id: "correction", label: "Inventory Correction", icon: "Γ£Å∩╕Å" },
++  "Damage / Breakage",
++  "Expired ΓÇö Disposal",
++  "Miscounted / Shortage",
++  "Customer Return",
++  "Other",
+ ];
+ 
+ export default function AdjustStockModal({ item, onClose, onAdjusted }: AdjustStockModalProps) {
+-  const [quantity, setQuantity] = useState("");
++  const [qty, setQty] = useState(1);
+   const [reason, setReason] = useState("");
++  const [loading, setLoading] = useState(false);
+   const [error, setError] = useState("");
+-  const [success, setSuccess] = useState<number | null>(null);
+ 
+   const handleAdjust = () => {
+-    const qty = parseInt(quantity, 10);
+-    if (!qty || qty <= 0) { setError("Enter quantity"); return; }
+-    if (qty > item.total_quantity) { setError("Exceeds stock"); return; }
+-    if (!reason) { setError("Select a reason"); return; }
+-
+-    const result = adjustStock(item.drug_id, qty, reason);
+-    if (result.success) {
+-      setSuccess(result.remaining);
+-      setTimeout(() => onAdjusted(result.remaining), 1500);
+-    } else {
+-      setError("Adjustment failed");
++    if (!reason) {
++      setError("Select a reason before adjusting");
++      return;
++    }
++    if (qty <= 0 || qty > item.total_quantity) {
++      setError("Quantity exceeds what's in stock");
++      return;
++    }
++    setLoading(true);
++    setError("");
++    try {
++      adjustStock(item.drug_id, qty, reason);
++      onAdjusted();
++    } catch (e: unknown) {
++      const msg = e instanceof Error ? e.message : "Adjustment failed";
++      setError(msg);
++    } finally {
++      setLoading(false);
+     }
+   };
+ 
+   return (
+-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center p-4">
++    <>
+       <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 1 }}
+         exit={{ opacity: 0 }}
+-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
++        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+         onClick={onClose}
+       />
+       <motion.div
+-        initial={{ y: "100%", opacity: 0 }}
+-        animate={{ y: 0, opacity: 1 }}
+-        exit={{ y: "100%", opacity: 0 }}
+-        className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-3xl shadow-2xl p-6 overflow-hidden"
++        initial={{ y: "100%" }}
++        animate={{ y: 0 }}
++        exit={{ y: "100%" }}
++        transition={{ type: "spring", damping: 32, stiffness: 350 }}
++        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-modal shadow-elevated max-h-[90vh] overflow-y-auto"
+       >
+-        <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-6 sm:hidden" />
++        {/* Header */}
++        <div className="flex items-center justify-between p-7 pb-4 border-b border-trust-border">
++          <div>
++            <h2 className="text-heading-md font-bold text-trust-text tracking-tight">Adjust Stock</h2>
++            <p className="text-trust-text-muted text-label font-medium mt-0.5">{item.drug_name}</p>
++          </div>
++          <button onClick={onClose} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
++            <X size={20} />
++          </button>
++        </div>
+ 
+-        <AnimatePresence mode="wait">
+-          {success !== null ? (
+-            <motion.div 
+-              key="success"
+-              initial={{ scale: 0.9, opacity: 0 }}
+-              animate={{ scale: 1, opacity: 1 }}
+-              className="flex flex-col items-center py-10"
+-            >
+-              <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mb-6">
+-                <CheckCircle2 size={40} className="text-amber-500" />
+-              </div>
+-              <h3 className="text-2xl font-black text-slate-800 tracking-tight">Stock Adjusted</h3>
+-              <p className="text-slate-400 font-bold mt-2">{success} units remaining on shelf</p>
+-            </motion.div>
+-          ) : (
+-            <motion.div key="form">
+-              <div className="flex items-center justify-between mb-8">
+-                <div>
+-                  <h3 className="font-black text-slate-800 text-2xl tracking-tight leading-none">Stock Adjustment</h3>
+-                  <p className="text-slate-400 text-xs mt-2 font-bold uppercase tracking-widest">{item.drug_name}</p>
+-                </div>
+-                <button onClick={onClose} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
+-                  <X size={20} />
++        <div className="p-7 space-y-6">
++          {/* Reason */}
++          <div>
++            <span className="section-label block mb-3">Reason for Adjustment</span>
++            <div className="flex flex-wrap gap-2.5">
++              {REASONS.map((r) => (
++                <button
++                  key={r}
++                  onClick={() => setReason(r)}
++                  className={cn(
++                    "px-4 py-3 rounded-button text-label font-semibold border transition-all duration-200",
++                    reason === r
++                      ? "bg-brand text-white border-brand shadow-sm"
++                      : "bg-trust-surface text-trust-text-secondary border-trust-border hover:border-brand/30"
++                  )}
++                >
++                  {r}
+                 </button>
+-              </div>
+-
+-              <div className="space-y-6">
+-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-4">Quantity to Deduct</label>
+-                  <div className="flex items-center gap-4">
+-                    <input
+-                      type="number"
+-                      placeholder="0"
+-                      autoFocus
+-                      value={quantity}
+-                      onChange={(e) => {
+-                        setQuantity(e.target.value);
+-                        setError("");
+-                      }}
+-                      className="w-full bg-transparent text-3xl font-black text-slate-800 placeholder:text-slate-200 outline-none"
+-                    />
+-                    <div className="h-10 w-[1px] bg-slate-200" />
+-                    <div className="text-right">
+-                      <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1">On Hand</p>
+-                      <p className="text-xl font-black text-slate-500 leading-none">{item.total_quantity}</p>
+-                    </div>
+-                  </div>
+-                </div>
++              ))}
++            </div>
++          </div>
+ 
+-                <div>
+-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3 ml-1">Reason for Adjustment</label>
+-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+-                    {REASONS.map((r) => (
+-                      <button
+-                        key={r.id}
+-                        onClick={() => {
+-                          setReason(r.id);
+-                          setError("");
+-                        }}
+-                        className={cn(
+-                          "w-full h-14 px-4 rounded-2xl flex items-center gap-3 border transition-all text-sm font-bold shadow-sm",
+-                          reason === r.id 
+-                            ? "bg-amber-50 border-amber-200 text-amber-700 ring-2 ring-amber-500/10" 
+-                            : "bg-white border-slate-100 text-slate-600 hover:border-slate-200"
+-                        )}
+-                      >
+-                        <span className="text-xl grayscale-0">{r.icon}</span>
+-                        {r.label}
+-                      </button>
+-                    ))}
+-                  </div>
+-                </div>
++          {/* Quantity */}
++          <div className="flex flex-col items-center gap-4">
++            <span className="section-label">Remove Quantity</span>
++            <div className="flex items-center gap-6">
++              <button
++                onClick={() => setQty(Math.max(1, qty - 1))}
++                className="w-14 h-14 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 active:bg-brand-50 transition-colors duration-200 border border-trust-border"
++              >
++                <Minus size={22} />
++              </button>
++              <span className="text-heading-xl font-bold text-trust-text min-w-[4rem] text-center tabular-nums">{qty}</span>
++              <button
++                onClick={() => setQty(Math.min(item.total_quantity, qty + 1))}
++                className="w-14 h-14 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 active:bg-brand-50 transition-colors duration-200 border border-trust-border"
++              >
++                <Plus size={22} />
++              </button>
++            </div>
++            <p className="text-label text-trust-text-muted font-medium">{item.total_quantity} in stock</p>
++          </div>
+ 
+-                <div className="pt-2">
+-                  <AnimatePresence>
+-                    {error && (
+-                      <motion.p 
+-                        initial={{ opacity: 0, y: -10 }}
+-                        animate={{ opacity: 1, y: 0 }}
+-                        exit={{ opacity: 0 }}
+-                        className="text-red-500 text-xs font-bold text-center mb-4 flex items-center justify-center gap-1.5"
+-                      >
+-                        <AlertTriangle size={14} />
+-                        {error}
+-                      </motion.p>
+-                    )}
+-                  </AnimatePresence>
++          {/* Summary */}
++          <div className="bg-warning-light border border-warning-border rounded-card p-5 text-center">
++            <span className="section-label text-warning block mb-2">After Adjustment</span>
++            <p className="text-heading-lg font-bold text-trust-text tabular-nums">
++              {item.total_quantity} ΓåÆ {Math.max(0, item.total_quantity - qty)} units
++            </p>
++          </div>
+ 
+-                  <button
+-                    onClick={handleAdjust}
+-                    disabled={!quantity || !reason || !!success}
+-                    className="w-full h-16 bg-[#004d40] text-white rounded-[20px] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-[#004d40]/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:grayscale"
+-                  >
+-                    Confirm Adjustment
+-                    <ArrowRight size={20} />
+-                  </button>
+-                </div>
+-              </div>
+-            </motion.div>
++          {/* Error */}
++          {error && (
++            <div className="text-danger text-label font-semibold bg-danger-light p-4 rounded-card border border-danger-border">
++              {error}
++            </div>
+           )}
+-        </AnimatePresence>
+-        <div className="h-6 sm:h-2" />
+-      </motion.div>
+-    </div>
+-  );
+-}
+ 
+-function ArrowRight({ size }: { size: number }) {
+-  return (
+-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+-      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+-    </svg>
++          {/* Actions */}
++          <div className="flex flex-col gap-3">
++            <button
++              onClick={handleAdjust}
++              disabled={loading}
++              className="btn-primary w-full bg-warning hover:bg-warning/90 border-warning/30"
++            >
++              {loading ? <Loader2 size={20} className="animate-spin" /> : (
++                <>
++                  <AlertTriangle size={20} />
++                  Confirm ΓÇó Remove {qty} Unit{qty !== 1 ? "s" : ""}
++                </>
++              )}
++            </button>
++            <button
++              onClick={onClose}
++              className="btn-secondary w-full"
++            >
++              Cancel
++            </button>
++          </div>
++        </div>
++      </motion.div>
++    </>
+   );
+ }
+diff --git a/src/components/AlertsScreen.tsx b/src/components/AlertsScreen.tsx
+index af4b8db..9effb75 100644
+--- a/src/components/AlertsScreen.tsx
++++ b/src/components/AlertsScreen.tsx
+@@ -1,7 +1,9 @@
+ "use client";
+ 
++import { useState } from "react";
++
+ import { motion } from "framer-motion";
+-import { ArrowLeft, Bell, Check, Trash2, Calendar, Package } from "lucide-react";
++import { ArrowLeft, Check, Calendar, Package } from "lucide-react";
+ import { InventoryItem } from "@/lib/types";
+ import { cn } from "@/lib/utils";
+ 
+@@ -11,60 +13,63 @@ interface AlertsScreenProps {
+ }
+ 
+ export default function AlertsScreen({ items, onBack }: AlertsScreenProps) {
+-  const threshold = 10;
++  const [now] = useState(() => Date.now());
+   const alerts = items.filter((i) => i.status !== "healthy");
+   const expiring = alerts.filter((i) => i.status === "expiring");
+   const lowStock = alerts.filter((i) => i.status === "low_stock");
+ 
+   return (
+-    <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
++    <div className="flex flex-col min-h-screen bg-trust-surface">
+       {/* Header */}
+-      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-5 sticky top-0 z-10 shadow-sm">
++      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
+         <div className="flex items-center gap-4">
+           <button
+             onClick={onBack}
+-            className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500"
++            className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200"
+           >
+             <ArrowLeft size={20} />
+           </button>
+           <div>
+-            <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Alerts</h1>
+-            <p className="text-slate-400 text-xs font-medium">
++            <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Alerts</h1>
++            <p className="text-trust-text-muted text-label font-medium mt-0.5">
+               {alerts.length === 0 ? "All clear ΓÇö nothing to review" : `${alerts.length} item${alerts.length !== 1 ? "s" : ""} need attention`}
+             </p>
+           </div>
+         </div>
+       </div>
+ 
+-      <div className="flex-1 px-6 py-5 space-y-6">
++      <div className="flex-1 px-7 py-6 space-y-7">
+         {alerts.length === 0 ? (
+           <motion.div
+-            initial={{ opacity: 0, scale: 0.95 }}
++            initial={{ opacity: 0, scale: 0.97 }}
+             animate={{ opacity: 1, scale: 1 }}
+-            className="flex flex-col items-center justify-center h-64 gap-4 text-slate-300"
++            transition={{ duration: 0.2 }}
++            className="flex flex-col items-center justify-center h-64 gap-5 text-trust-text-faint"
+           >
+-            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center">
+-              <Check size={36} className="text-[#2e7d32]" />
++            <div className="w-18 h-18 bg-success-light rounded-full flex items-center justify-center border border-success-border">
++              <Check size={32} className="text-success" />
++            </div>
++            <div className="text-center">
++              <p className="font-bold text-body text-trust-text-secondary">All clear</p>
++              <p className="text-trust-text-muted text-label mt-1 leading-relaxed">
++                No products expiring soon.<br />No low stock warnings.
++              </p>
+             </div>
+-            <p className="font-bold text-slate-500 text-base">All clear</p>
+-            <p className="text-slate-400 text-sm text-center px-4">
+-              No drugs expiring soon.<br />No low stock warnings.
+-            </p>
+           </motion.div>
+         ) : (
+           <>
+             {/* Expiring Soon */}
+             {expiring.length > 0 && (
+               <div>
+-                <div className="flex items-center gap-2 mb-3">
+-                  <Calendar size={16} className="text-red-500" />
+-                  <h2 className="text-xs font-black text-red-500 uppercase tracking-wider">Expiring Within 30 Days</h2>
+-                  <span className="ml-auto text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">{expiring.length}</span>
++                <div className="flex items-center gap-2 mb-4">
++                  <Calendar size={16} className="text-danger" />
++                  <h2 className="section-label text-danger">Expiring Within 30 Days</h2>
++                  <span className="ml-auto badge badge-danger">{expiring.length}</span>
+                 </div>
+                 <div className="space-y-3">
+                   {expiring.map((item) => {
+                     const days = Math.floor(
+-                      (new Date(item.nearest_expiry).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
++                      (new Date(item.nearest_expiry).getTime() - now) / (1000 * 60 * 60 * 24)
+                     );
+                     return (
+                       <AlertCard
+@@ -72,8 +77,8 @@ export default function AlertsScreen({ items, onBack }: AlertsScreenProps) {
+                         title={item.drug_name}
+                         subtitle={`${item.drug_reg_no} ┬╖ ${item.total_quantity} units`}
+                         flag={days <= 0 ? "Expired" : days === 1 ? "Expires tomorrow" : `${days} days left`}
+-                        flagClass="bg-red-50 text-red-600 border-red-100"
+-                        icon={<Calendar size={18} className="text-red-500" />}
++                        flagClass="badge-danger"
++                        icon={<Calendar size={18} className="text-danger" />}
+                       />
+                     );
+                   })}
+@@ -84,10 +89,10 @@ export default function AlertsScreen({ items, onBack }: AlertsScreenProps) {
+             {/* Low Stock */}
+             {lowStock.length > 0 && (
+               <div>
+-                <div className="flex items-center gap-2 mb-3">
+-                  <Package size={16} className="text-amber-500" />
+-                  <h2 className="text-xs font-black text-amber-500 uppercase tracking-wider">Low Stock</h2>
+-                  <span className="ml-auto text-[10px] font-bold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">{lowStock.length}</span>
++                <div className="flex items-center gap-2 mb-4">
++                  <Package size={16} className="text-warning" />
++                  <h2 className="section-label text-warning">Low Stock</h2>
++                  <span className="ml-auto badge badge-warning">{lowStock.length}</span>
+                 </div>
+                 <div className="space-y-3">
+                   {lowStock.map((item) => (
+@@ -96,8 +101,8 @@ export default function AlertsScreen({ items, onBack }: AlertsScreenProps) {
+                       title={item.drug_name}
+                       subtitle={item.drug_reg_no}
+                       flag={`${item.total_quantity} units left`}
+-                      flagClass="bg-amber-50 text-amber-700 border-amber-100"
+-                      icon={<Package size={18} className="text-amber-500" />}
++                      flagClass="badge-warning"
++                      icon={<Package size={18} className="text-warning" />}
+                     />
+                   ))}
+                 </div>
+@@ -119,18 +124,19 @@ function AlertCard({ title, subtitle, flag, flagClass, icon }: {
+ }) {
+   return (
+     <motion.div
+-      initial={{ opacity: 0, y: 10 }}
++      initial={{ opacity: 0, y: 8 }}
+       animate={{ opacity: 1, y: 0 }}
+-      className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center gap-4"
++      transition={{ duration: 0.2 }}
++      className="card p-5 flex items-center gap-4"
+     >
+-      <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
++      <div className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center shrink-0">
+         {icon}
+       </div>
+       <div className="flex-1 min-w-0">
+-        <h3 className="font-extrabold text-slate-800 text-sm leading-tight truncate">{title}</h3>
+-        <p className="text-slate-400 text-xs font-medium mt-0.5 truncate">{subtitle}</p>
++        <h3 className="font-bold text-trust-text text-label leading-tight truncate">{title}</h3>
++        <p className="text-trust-text-muted text-label font-medium mt-0.5 truncate">{subtitle}</p>
+       </div>
+-      <span className={cn("text-[10px] font-black px-2.5 py-1.5 rounded-full border whitespace-nowrap", flagClass)}>
++      <span className={cn("badge whitespace-nowrap", flagClass)}>
+         {flag}
+       </span>
+     </motion.div>
+diff --git a/src/components/AuthScreen.tsx b/src/components/AuthScreen.tsx
+index 5657a4f..7cf39b6 100644
+--- a/src/components/AuthScreen.tsx
++++ b/src/components/AuthScreen.tsx
+@@ -56,8 +56,9 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
+         }
+         setMode("onboarding");
+       }
+-    } catch (e: any) {
+-      setError(e.message || "An authentication error occurred");
++    } catch (e: unknown) {
++      const msg = e instanceof Error ? e.message : "An authentication error occurred";
++      setError(msg);
+     } finally {
+       setLoading(false);
+     }
+@@ -105,7 +106,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
+         throw new Error("Session expired. Please log in again.");
+       }
+ 
+-      // 1. Sync Username to Auth Metadata
++      // Sync Username to Auth Metadata
+       await supabase.auth.updateUser({
+         data: { display_name: username }
+       });
+@@ -137,82 +138,111 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
+       if (bErr) throw bErr;
+ 
+       onSuccess();
+-    } catch (e: any) {
++    } catch (e: unknown) {
++      const msg = e instanceof Error ? e.message : "Failed to register store. Check your internet connection.";
+       console.error("Store Registration Error:", e);
+-      setError(e.message || "Failed to register store. Check your internet connection.");
++      setError(msg);
+     } finally {
+       setLoading(false);
+     }
+   };
+ 
++  const headingText = () => {
++    switch (mode) {
++      case "onboarding": return "Set Up Store";
++      case "forgot": return "Reset Access";
++      case "update_password": return "New Password";
++      default: return "KO-Mart";
++    }
++  };
++
++  const subtitleText = () => {
++    switch (mode) {
++      case "onboarding": return "Welcome! Choose a name for your store.";
++      case "forgot": return "We'll send a secure reset link to your email.";
++      case "update_password": return "Secure your account with a fresh password.";
++      case "login": return "Sign in to your store account";
++      default: return "Create a new store account";
++    }
++  };
++
+   return (
+-    <div className="fixed inset-0 bg-[#f8f9fa] flex flex-col items-center justify-center p-8 z-50 overflow-hidden">
++    <div className="fixed inset-0 bg-trust-surface flex flex-col items-center justify-center p-8 z-50 overflow-hidden">
+       <div className="w-full max-w-sm">
++        {/* Logo */}
+         <motion.div
+-          initial={{ scale: 0.8, opacity: 0 }}
++          initial={{ scale: 0.85, opacity: 0 }}
+           animate={{ scale: 1, opacity: 1 }}
+-          className="w-20 h-20 bg-[#0f172a] rounded-[28px] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-[#0f172a]/30"
++          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
++          className="w-18 h-18 bg-brand rounded-[20px] flex items-center justify-center mx-auto mb-8 shadow-elevated relative overflow-hidden"
+         >
+-          <Shield size={36} className="text-white" />
++          <div className="absolute inset-0 bg-gradient-to-br from-white/8 to-transparent" />
++          <Shield size={32} className="text-white relative z-10" />
+         </motion.div>
+ 
+-        <h1 className="text-3xl font-black text-slate-800 text-center tracking-tight mb-2 uppercase">
+-          {mode === "onboarding" ? "Register Store" : mode === "forgot" ? "Reset Access" : mode === "update_password" ? "New Password" : "KO-Mart"}
++        {/* Title */}
++        <h1 className="text-heading-xl font-bold text-trust-text text-center tracking-tight mb-2">
++          {headingText()}
+         </h1>
+-        <p className="text-center text-sm font-medium text-slate-400 mb-8 px-4">
+-          {mode === "onboarding" ? "Welcome! Choose a name for your store." 
+-            : mode === "forgot" ? "We'll send you a secure link to your admin email." 
+-            : mode === "update_password" ? "Secure your account with a fresh password."
+-            : mode === "login" ? "Enter your admin credentials" : "Create a new store account"}
++        <p className="text-center text-label font-medium text-trust-text-secondary mb-8 px-2">
++          {subtitleText()}
+         </p>
+ 
+         <div className="space-y-4">
+           <AnimatePresence mode="wait">
+             {mode === "onboarding" ? (
+-              <motion.div key="onboarding" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
+-                <div className="relative">
+-                  <User className="absolute left-4 top-4 text-slate-400" size={20} />
++              <motion.div key="onboarding" initial={{ x: 16, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.2 }} className="space-y-4">
++                {/* Username */}
++                <div className="input-icon">
++                  <User className="icon" size={20} />
+                   <input
+                     type="text"
+                     placeholder="Your Full Name / Username"
+                     value={username}
+                     onChange={(e) => setUsername(e.target.value)}
+-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all"
++                    className="input-field"
++                    style={{ paddingLeft: '48px' }}
+                   />
+                 </div>
+-                <div className="relative">
+-                  <Store className="absolute left-4 top-4 text-slate-400" size={20} />
++                {/* Store Name */}
++                <div className="input-icon">
++                  <Store className="icon" size={20} />
+                   <input
+                     type="text"
+                     placeholder="Store Name (e.g. KO-Mart Central)"
+                     value={pharmacyName}
+                     onChange={(e) => setPharmacyName(e.target.value)}
+-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all"
++                    className="input-field"
++                    style={{ paddingLeft: '48px' }}
+                   />
+                 </div>
+               </motion.div>
+             ) : (
+-              <motion.div key="auth" initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
+-                <div className="relative">
+-                  <Mail className="absolute left-4 top-4 text-slate-400" size={20} />
++              <motion.div key="auth" initial={{ x: -16, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.2 }} className="space-y-4">
++                {/* Email */}
++                <div className="input-icon">
++                  <Mail className="icon" size={20} />
+                   <input
+                     type="email"
+                     placeholder="Admin Email"
+                     value={email}
+                     onChange={(e) => setEmail(e.target.value)}
+                     disabled={mode === "update_password"}
+-                    className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all disabled:opacity-50"
++                    className="input-field"
++                    style={{ paddingLeft: '48px' }}
+                   />
+                 </div>
++                {/* Password */}
+                 {mode !== "forgot" && (
+-                  <div className="relative">
+-                    <Lock className="absolute left-4 top-4 text-slate-400" size={20} />
++                  <div className="input-icon">
++                    <Lock className="icon" size={20} />
+                     <input
+                       type="password"
+                       placeholder={mode === "update_password" ? "New Password" : "Password"}
+                       value={password}
+                       onChange={(e) => setPassword(e.target.value)}
+-                      className="w-full h-14 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 font-bold text-slate-800 focus:ring-2 focus:ring-[#0f172a]/20 outline-none transition-all"
++                      className="input-field"
++                      style={{ paddingLeft: '48px' }}
+                     />
+                   </div>
+                 )}
+@@ -220,7 +250,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
+                   <div className="text-right px-1">
+                     <button 
+                       onClick={() => { setMode("forgot"); setError(""); setSuccessMsg(""); }}
+-                      className="text-xs font-bold text-[#0f172a]/60 hover:text-[#0f172a]"
++                      className="text-label font-semibold text-trust-text-muted hover:text-brand transition-colors min-h-0"
+                     >
+                       Forgot Password?
+                     </button>
+@@ -230,45 +260,49 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
+             )}
+           </AnimatePresence>
+ 
++          {/* Error */}
+           {error && (
+-            <div className="flex items-center gap-2 text-red-500 text-xs font-bold bg-red-50 p-4 rounded-xl">
+-              <AlertCircle size={14} />
++            <div className="flex items-center gap-3 text-danger text-label font-semibold bg-danger-light p-4 rounded-card border border-danger-border">
++              <AlertCircle size={16} className="shrink-0" />
+               {error}
+             </div>
+           )}
+ 
++          {/* Success */}
+           {successMsg && (
+-            <div className="flex items-center gap-2 text-green-600 text-xs font-bold bg-green-50 p-4 rounded-xl">
+-              <Shield size={14} />
++            <div className="flex items-center gap-3 text-success text-label font-semibold bg-success-light p-4 rounded-card border border-success-border">
++              <Shield size={16} className="shrink-0" />
+               {successMsg}
+             </div>
+           )}
+ 
++          {/* Submit */}
+           <button
+             onClick={mode === "onboarding" ? handleRegisterStore : handleAuth}
+             disabled={loading}
+-            className="w-full h-14 bg-[#0f172a] text-white rounded-2xl font-black text-lg shadow-lg shadow-[#0f172a]/20 flex items-center justify-center gap-2 transform active:scale-[0.98] transition-all disabled:opacity-50"
++            className="btn-primary w-full"
+           >
+-            {loading ? <Loader2 size={24} className="animate-spin" /> : (
++            {loading ? <Loader2 size={22} className="animate-spin" /> : (
+               <>
+                 {mode === "login" ? "Sign In" : mode === "signup" ? "Get Started" : mode === "forgot" ? "Send Reset Link" : mode === "onboarding" ? "Finish Setup" : "Update Password"}
+-                <ArrowRight size={20} />
++                <ArrowRight size={18} />
+               </>
+             )}
+           </button>
+ 
++          {/* Mode Toggle */}
+           {mode !== "onboarding" && mode !== "update_password" && (
+-            <div className="flex flex-col gap-2">
++            <div className="flex flex-col gap-2 pt-2">
+               <button
+                 onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setSuccessMsg(""); }}
+-                className="w-full py-2 text-sm font-bold text-slate-500 hover:text-[#0f172a] transition-colors"
++                className="btn-ghost w-full text-label"
+               >
+                 {mode === "login" ? "Need a store account? Sign Up" : "Already have an account? Log In"}
+               </button>
+               {mode === "forgot" && (
+                 <button
+                   onClick={() => { setMode("login"); setError(""); setSuccessMsg(""); }}
+-                  className="w-full py-2 text-xs font-black text-[#0f172a] uppercase tracking-wider"
++                  className="btn-ghost w-full text-label font-bold text-brand"
+                 >
+                   ΓåÉ Back to Login
+                 </button>
+diff --git a/src/components/Dashboard.tsx b/src/components/Dashboard.tsx
+index fa12fa0..e9097c9 100644
+--- a/src/components/Dashboard.tsx
++++ b/src/components/Dashboard.tsx
+@@ -36,110 +36,116 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, onL
+   };
+ 
+   return (
+-    <div className="flex flex-col min-h-screen bg-[#f8f9fa] pb-10">
+-      {/* Header */}
+-      <header className="px-6 pt-14 pb-6 bg-[#0f172a] text-white rounded-b-[40px] shadow-xl shadow-[#0f172a]/20">
++    <div className="flex flex-col min-h-screen bg-trust-surface pb-10">
++      {/* ΓöÇΓöÇ Header ΓöÇΓöÇ */}
++      <header className="px-7 pt-14 pb-8 bg-brand text-white rounded-b-[32px] shadow-elevated relative overflow-hidden">
++        {/* Metallic trim at bottom edge */}
++        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-metallic-dark via-metallic-light to-metallic-dark opacity-30" />
++        
+         <div className="flex items-start justify-between mb-1">
+           <div>
+-            <p className="text-white/60 text-sm font-medium">{greeting}{displayName ? `, ${displayName}` : ""}</p>
+-            <h1 className="text-3xl font-black tracking-tight leading-none">KO-Mart</h1>
++            <p className="text-white/60 text-label font-medium">{greeting}{displayName ? `, ${displayName}` : ""}</p>
++            <h1 className="text-heading-xl font-bold tracking-tight leading-none mt-1">KO-Mart</h1>
+           </div>
+-          <div className="flex flex-col items-end gap-2">
++          <div className="flex flex-col items-end gap-3">
+             <button 
+               onClick={handleLogout}
+-              className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white/60 hover:text-white"
++              className="w-11 h-11 bg-white/10 rounded-button flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 transition-all duration-200"
+             >
+               <LogOut size={18} />
+             </button>
+-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+-              isOnline ? "bg-white/15 text-white/80" : "bg-red-500/20 text-red-300"
++            <div className={`flex items-center gap-2 px-3 py-2 rounded-badge text-label-sm font-semibold ${
++              isOnline ? "bg-white/12 text-white/75" : "bg-danger/20 text-red-300"
+             }`}>
+-              {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
++              {isOnline ? <Wifi size={14} /> : <WifiOff size={14} />}
+               {isOnline ? "Online" : "Offline"}
+             </div>
+           </div>
+         </div>
+       </header>
+ 
+-      {/* Offline banner */}
++      {/* ΓöÇΓöÇ Offline Banner ΓöÇΓöÇ */}
+       {!isOnline && (
+         <motion.div
+           initial={{ height: 0, opacity: 0 }}
+           animate={{ height: "auto", opacity: 1 }}
+-          className="mx-6 mt-4 bg-amber-50 border border-amber-200 text-amber-700 text-sm font-semibold px-4 py-3 rounded-2xl flex items-center gap-2"
++          transition={{ duration: 0.2 }}
++          className="mx-7 mt-5 bg-warning-light border border-warning-border text-warning text-label font-semibold px-5 py-4 rounded-card flex items-center gap-3"
+         >
+-          <WifiOff size={16} />
+-          Offline mode active ΓÇö local inventory and SKU cache available
++          <WifiOff size={18} />
++          Offline mode ΓÇö local inventory and SKU cache available
+         </motion.div>
+       )}
+ 
+-      <div className="px-6 mt-8 flex flex-col gap-4 flex-1">
+-        {/* PRIMARY ΓÇö Search / Verify (anchor feature) */}
++      <div className="px-7 mt-8 flex flex-col gap-5 flex-1">
++        {/* ΓöÇΓöÇ PRIMARY ΓÇö Find Product (anchor feature) ΓöÇΓöÇ */}
+         <motion.button
+-          whileTap={{ scale: 0.97 }}
++          whileTap={{ scale: 0.98 }}
+           onClick={onVerify}
+-          className="w-full bg-[#0f172a] text-white rounded-[28px] p-8 flex flex-col items-start gap-4 shadow-2xl shadow-[#0f172a]/25 active:shadow-lg transition-all"
++          className="card-premium w-full bg-brand text-white p-7 flex flex-col items-start gap-5 shadow-elevated active:shadow-card transition-all duration-200"
++          style={{ borderColor: 'transparent' }}
+         >
+-          <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center">
+-            <Search size={28} strokeWidth={2.5} />
++          <div className="w-14 h-14 bg-white/12 rounded-card flex items-center justify-center">
++            <Search size={26} strokeWidth={2} />
+           </div>
+           <div>
+-            <h2 className="text-2xl font-black tracking-tight leading-none">Find Product</h2>
+-            <p className="text-white/50 text-sm mt-1 font-medium">Search by Store SKU or Registration</p>
++            <h2 className="text-heading-lg font-bold tracking-tight leading-none">Find Product</h2>
++            <p className="text-white/55 text-label mt-2 font-medium">Search by Store SKU or Registration</p>
+           </div>
+         </motion.button>
+ 
+-        {/* SECONDARY ROW */}
++        {/* ΓöÇΓöÇ SECONDARY ROW ΓöÇΓöÇ */}
+         <div className="grid grid-cols-2 gap-4">
+           <motion.button
+-            whileTap={{ scale: 0.96 }}
++            whileTap={{ scale: 0.97 }}
+             onClick={onInventory}
+-            className="bg-white border border-slate-100 rounded-[24px] p-5 flex flex-col items-start gap-3 shadow-sm"
++            className="card bg-white p-6 flex flex-col items-start gap-4 text-left"
+           >
+-            <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-500">
++            <div className="w-12 h-12 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary">
+               <Package size={22} />
+             </div>
+             <div>
+-              <h3 className="text-base font-black text-slate-700 leading-none">Inventory</h3>
+-              <p className="text-slate-400 text-xs mt-0.5 font-medium">Stock &amp; batches</p>
++              <h3 className="text-body font-bold text-trust-text leading-none">Inventory</h3>
++              <p className="text-trust-text-muted text-label mt-1 font-medium">Stock & batches</p>
+             </div>
+           </motion.button>
+ 
+           <motion.button
+-            whileTap={{ scale: 0.96 }}
++            whileTap={{ scale: 0.97 }}
+             onClick={onAlerts}
+-            className="relative bg-white border border-slate-100 rounded-[24px] p-5 flex flex-col items-start gap-3 shadow-sm overflow-hidden"
++            className="card bg-white p-6 flex flex-col items-start gap-4 text-left relative overflow-hidden"
+           >
+             {alertCount > 0 && (
+-              <div className="absolute top-4 right-4 bg-[#ff8f00] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
++              <div className="absolute top-5 right-5 bg-warning text-white text-label-sm font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                 {alertCount > 9 ? "9+" : alertCount}
+               </div>
+             )}
+-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${alertCount > 0 ? "bg-amber-50 text-[#ff8f00]" : "bg-slate-50 text-slate-400"}`}>
++            <div className={`w-12 h-12 rounded-button flex items-center justify-center ${alertCount > 0 ? "bg-warning-light text-warning" : "bg-trust-surface text-trust-text-muted"}`}>
+               <Bell size={22} />
+             </div>
+             <div>
+-              <h3 className="text-base font-black text-slate-700 leading-none">Alerts</h3>
+-              <p className="text-slate-400 text-xs mt-0.5 font-medium">
++              <h3 className="text-body font-bold text-trust-text leading-none">Alerts</h3>
++              <p className="text-trust-text-muted text-label mt-1 font-medium">
+                 {alertCount > 0 ? `${alertCount} need${alertCount === 1 ? "s" : ""} attention` : "All clear"}
+               </p>
+             </div>
+           </motion.button>
+         </div>
+ 
+-        {/* LOGS BUTTON - PRIORITY UTILITY */}
++        {/* ΓöÇΓöÇ ACTIVITY LOG ΓöÇΓöÇ */}
+         <motion.button
+           whileTap={{ scale: 0.98 }}
+           onClick={onLogs}
+-          className="w-full bg-slate-800 text-white rounded-[24px] p-5 flex items-center justify-between shadow-lg shadow-slate-800/10 mt-2"
++          className="card-premium w-full bg-brand-dark text-white p-6 flex items-center justify-between mt-1"
++          style={{ borderColor: 'transparent' }}
+         >
+           <div className="flex items-center gap-4">
+-            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
++            <div className="w-11 h-11 bg-white/10 rounded-button flex items-center justify-center">
+               <History size={20} />
+             </div>
+             <div className="text-left">
+-              <h3 className="text-sm font-black text-white leading-none">Activity Log</h3>
+-              <p className="text-white/40 text-[10px] mt-1 font-bold uppercase tracking-wider">Audit Trail &amp; Financials</p>
++              <h3 className="text-label font-bold text-white leading-none">Activity Log</h3>
++              <p className="text-white/40 text-label-sm mt-1 font-semibold uppercase tracking-wider">Audit Trail & Financials</p>
+             </div>
+           </div>
+           <ArrowRight size={18} className="text-white/30" />
+diff --git a/src/components/InventoryList.tsx b/src/components/InventoryList.tsx
+index 8d00080..36145c5 100644
+--- a/src/components/InventoryList.tsx
++++ b/src/components/InventoryList.tsx
+@@ -19,7 +19,7 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
+   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
+   const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
+   const [search, setSearch] = useState("");
+-  const [now] = useState(() => Date.now()); // Stable render timestamp to avoid impure useMemo warning
++  const [now] = useState(() => Date.now());
+ 
+   const filtered = search.trim()
+     ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.drug_reg_no.includes(search))
+@@ -27,8 +27,8 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
+ 
+   const statusConfig = {
+     healthy: { label: "", labelClass: "" },
+-    expiring: { label: "Expiring Soon", labelClass: "bg-red-50 text-red-600 border-red-100" },
+-    low_stock: { label: "Low Stock", labelClass: "bg-amber-50 text-amber-600 border-amber-100" },
++    expiring: { label: "Expiring Soon", labelClass: "badge-danger" },
++    low_stock: { label: "Low Stock", labelClass: "badge-warning" },
+   };
+ 
+   // Compute summary totals
+@@ -38,65 +38,66 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
+   const alertsCount = filtered.filter(i => i.status !== 'healthy').length;
+ 
+   return (
+-    <div className="flex flex-col min-h-screen bg-[#f8f9fa]">
++    <div className="flex flex-col min-h-screen bg-trust-surface">
+       {/* Header */}
+-      <div className="bg-white border-b border-slate-100 px-6 pt-14 pb-6 sticky top-0 z-10 shadow-sm">
+-        <div className="flex items-center gap-4 mb-4">
++      <div className="bg-white border-b border-trust-border px-7 pt-14 pb-6 sticky top-0 z-10 shadow-card">
++        <div className="flex items-center gap-4 mb-5">
+           <button
+             onClick={onBack}
+-            className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500"
++            className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200"
+           >
+             <ArrowLeft size={20} />
+           </button>
+           <div>
+-            <h1 className="text-xl font-black text-slate-800 uppercase tracking-tight">Active Stock</h1>
+-            <p className="text-slate-400 text-xs font-medium">{items.length} product{items.length !== 1 ? "s" : ""} tracked</p>
++            <h1 className="text-heading-md font-bold text-trust-text tracking-tight">Active Stock</h1>
++            <p className="text-trust-text-muted text-label font-medium mt-0.5">{items.length} product{items.length !== 1 ? "s" : ""} tracked</p>
+           </div>
+         </div>
+ 
+-        {/* Global Summary Row */}
++        {/* Summary Row */}
+         <div className="flex gap-3 mb-5 overflow-x-auto hide-scrollbar pb-1 -mx-2 px-2 snap-x">
+-          <div className="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
+-            <span className="text-[9px] uppercase font-black text-slate-400 tracking-wider">Total Value (Cost)</span>
+-            <p className="text-base font-black text-slate-800 mt-0.5">Γéª{totalCost.toLocaleString()}</p>
++          <div className="card p-4 min-w-[130px] snap-start">
++            <span className="section-label block">Total Value (Cost)</span>
++            <p className="text-body font-bold text-trust-text mt-1">Γéª{totalCost.toLocaleString()}</p>
+           </div>
+-          <div className="bg-green-50 border border-green-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
+-            <span className="text-[9px] uppercase font-black text-[#2e7d32] tracking-wider">Potential Profit</span>
+-            <p className="text-base font-black text-[#2e7d32] mt-0.5">Γéª{potentialProfit.toLocaleString()}</p>
++          <div className="bg-success-light border border-success-border p-4 rounded-card min-w-[130px] snap-start">
++            <span className="section-label text-success block">Potential Profit</span>
++            <p className="text-body font-bold text-success mt-1">Γéª{potentialProfit.toLocaleString()}</p>
+           </div>
+-          <div className="bg-amber-50 border border-amber-100 px-4 py-2.5 rounded-[16px] min-w-[120px] snap-start">
+-            <span className="text-[9px] uppercase font-black text-amber-600 tracking-wider">Action Needed</span>
+-            <p className="text-base font-black text-amber-600 mt-0.5">{alertsCount} flagged</p>
++          <div className="bg-warning-light border border-warning-border p-4 rounded-card min-w-[130px] snap-start">
++            <span className="section-label text-warning block">Action Needed</span>
++            <p className="text-body font-bold text-warning mt-1">{alertsCount} flagged</p>
+           </div>
+         </div>
+ 
+         {/* Search */}
+-        <div className="relative">
+-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
++        <div className="input-icon">
++          <Search size={18} className="icon" />
+           <input
+             type="text"
+             placeholder="Search by name or registration..."
+             value={search}
+             onChange={(e) => setSearch(e.target.value)}
+-            className="w-full h-12 bg-slate-50 rounded-xl pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0f172a]/20 border border-slate-100 placeholder:text-slate-300"
++            className="input-field"
++            style={{ paddingLeft: '48px', height: '48px' }}
+           />
+         </div>
+       </div>
+ 
+       {/* Content */}
+-      <div className="flex-1 px-6 py-4 pb-28 space-y-3">
++      <div className="flex-1 px-7 py-5 pb-28 space-y-4">
+         {filtered.length === 0 ? (
+-          <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-300">
+-            <Package size={52} />
+-            <p className="font-bold text-sm text-slate-400">
++          <div className="flex flex-col items-center justify-center h-64 gap-5 text-trust-text-faint">
++            <Package size={48} />
++            <p className="font-semibold text-label text-trust-text-muted">
+               {search ? "No products match your search" : "No products in inventory yet"}
+             </p>
+             {!search && (
+               <button
+                 onClick={onAddNew}
+-                className="mt-2 bg-[#0f172a] text-white text-sm font-bold px-6 py-3 rounded-xl"
++                className="btn-primary"
+               >
+-                Find &amp; Add First Item
++                Find & Add First Item
+               </button>
+             )}
+           </div>
+@@ -124,75 +125,75 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
+             const daysOfSupply = Math.floor(item.total_quantity / avgUsage);
+             
+             const stockPercent = Math.min(100, Math.max(0, (item.total_quantity / (reorderPt * 2)) * 100));
+-            const progressColor = item.total_quantity <= reorderPt ? "bg-amber-500" : "bg-[#2e7d32]";
++            const progressColor = item.total_quantity <= reorderPt ? "bg-warning" : "bg-success";
+ 
+             return (
+               <motion.div
+                 key={item.drug_id}
+                 layout
+-                className="bg-white rounded-[24px] border border-slate-100 shadow-sm overflow-hidden"
++                className="card-premium overflow-hidden"
+               >
+-                <div className="p-5">
+-                  <div className="flex items-start justify-between mb-4">
++                <div className="p-6">
++                  <div className="flex items-start justify-between mb-5">
+                     <div className="flex-1 mr-4">
+-                      <h3 className="font-extrabold text-slate-800 text-lg leading-tight mb-1">{item.drug_name}</h3>
+-                      <span className="text-[10px] font-mono font-bold text-slate-400 uppercase bg-slate-50 px-2 py-0.5 rounded-md">{item.drug_reg_no}</span>
++                      <h3 className="font-bold text-trust-text text-body-lg leading-tight mb-1.5">{item.drug_name}</h3>
++                      <span className="text-label-sm font-mono font-semibold text-trust-text-muted bg-trust-surface px-2.5 py-1 rounded-badge">{item.drug_reg_no}</span>
+                     </div>
+                     {(item.status !== "healthy" || daysOfSupply <= 14) && (
+-                      <span className={cn("text-[9px] font-black px-2.5 py-1 rounded-full border uppercase tracking-wider whitespace-nowrap", cfg.labelClass || "bg-blue-50 text-blue-600 border-blue-100")}>
++                      <span className={cn("badge whitespace-nowrap", cfg.labelClass || "badge-neutral")}>
+                         {cfg.label || `${daysOfSupply}d supply`}
+                       </span>
+                     )}
+                   </div>
+ 
+                   {/* Stock Bar */}
+-                  <div className="mb-5 bg-slate-50 p-4 rounded-[16px] border border-slate-100">
+-                    <div className="flex justify-between items-end mb-2">
++                  <div className="mb-5 bg-trust-surface p-5 rounded-card border border-trust-border-subtle">
++                    <div className="flex justify-between items-end mb-3">
+                       <div>
+-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-0.5 border-b-2 w-8 border-transparent">Units</span>
+-                        <p className="text-2xl font-black text-slate-800 leading-none">{item.total_quantity}</p>
++                        <span className="section-label block mb-1">Units</span>
++                        <p className="text-heading-lg font-bold text-trust-text leading-none">{item.total_quantity}</p>
+                       </div>
+                       <div className="text-right">
+-                        <span className="text-[9px] font-bold text-slate-400 uppercase block">Reorder at {reorderPt}</span>
+-                        <span className="text-xs font-bold text-slate-500">{daysOfSupply} days left</span>
++                        <span className="section-label block mb-0.5">Reorder at {reorderPt}</span>
++                        <span className="text-label font-semibold text-trust-text-secondary">{daysOfSupply} days left</span>
+                       </div>
+                     </div>
+-                    {/* Visual Progress */}
+-                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden mt-2">
++                    <div className="h-2.5 w-full bg-trust-border rounded-full overflow-hidden mt-2">
+                        <motion.div 
+                          initial={{ width: 0 }} 
+                          animate={{ width: `${stockPercent}%` }} 
+-                         className={cn("h-full rounded-full transition-colors duration-500", progressColor)}
++                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
++                         className={cn("h-full rounded-full", progressColor)}
+                        />
+                     </div>
+                   </div>
+ 
+                   {/* Economics Grid */}
+-                  <div className="grid grid-cols-2 gap-3 mb-4">
+-                    <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Est. Revenue</span>
+-                      <p className="text-sm font-black text-slate-700">Γéª{valCost.toLocaleString()} ΓåÆ Γéª{(valCost + valProfit).toLocaleString()}</p>
++                  <div className="grid grid-cols-2 gap-4 mb-5">
++                    <div className="bg-trust-surface p-4 rounded-card border border-trust-border-subtle">
++                      <span className="section-label block mb-1">Est. Revenue</span>
++                      <p className="text-label font-bold text-trust-text">Γéª{valCost.toLocaleString()} ΓåÆ Γéª{(valCost + valProfit).toLocaleString()}</p>
+                     </div>
+-                    <div className="bg-green-50/50 p-3 rounded-xl border border-green-50">
++                    <div className="bg-success-light p-4 rounded-card border border-success-border">
+                       <div className="flex justify-between items-baseline">
+-                        <span className="text-[9px] font-bold text-[#2e7d32]/70 uppercase tracking-wider block">Margin</span>
+-                        <span className="text-[10px] font-black text-[#2e7d32]">{margin}%</span>
++                        <span className="section-label text-success block">Margin</span>
++                        <span className="text-label-sm font-bold text-success">{margin}%</span>
+                       </div>
+-                      <p className="text-sm font-black text-[#2e7d32]">+ Γéª{valProfit.toLocaleString()}</p>
++                      <p className="text-label font-bold text-success mt-0.5">+ Γéª{valProfit.toLocaleString()}</p>
+                     </div>
+                   </div>
+ 
+-                  <div className="flex gap-4">
++                  <div className="flex gap-6">
+                     <div>
+-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Pricing</span>
+-                      <p className="text-xs font-bold text-slate-600">
+-                         Cost Γéª{cost.toLocaleString()} <span className="text-slate-300">|</span> Sell Γéª{sell.toLocaleString()}
++                      <span className="section-label block mb-1">Pricing</span>
++                      <p className="text-label font-semibold text-trust-text-secondary">
++                         Cost Γéª{cost.toLocaleString()} <span className="text-trust-text-faint">|</span> Sell Γéª{sell.toLocaleString()}
+                       </p>
+                     </div>
+                     <div>
+-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide block">Expiry</span>
+-                      <p className={cn("text-xs font-bold flex items-center gap-1", item.status === "expiring" ? "text-red-600" : "text-slate-600")}>
+-                        <Calendar size={11} />
++                      <span className="section-label block mb-1">Expiry</span>
++                      <p className={cn("text-label font-semibold flex items-center gap-1.5", item.status === "expiring" ? "text-danger" : "text-trust-text-secondary")}>
++                        <Calendar size={13} />
+                         {isValidDate ? (daysToExpiry <= 0 ? "Expired" : daysToExpiry === 1 ? "Tomorrow" : daysToExpiry <= 30 ? `${daysToExpiry}d left` : new Date(item.nearest_expiry).toLocaleDateString(undefined, { month: "short", year: "numeric" })) : "Unknown"}
+                       </p>
+                     </div>
+@@ -200,17 +201,17 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
+                 </div>
+ 
+                 {/* Actions */}
+-                <div className="border-t border-slate-100 bg-slate-50/30 px-5 py-3 flex gap-2">
++                <div className="border-t border-trust-border-subtle bg-trust-surface/50 px-6 py-4 flex gap-3">
+                   <button
+                     onClick={() => setSellTarget(item)}
+-                    className="flex-[2] h-12 bg-white border border-slate-200 text-[#004d40] font-black rounded-xl flex items-center justify-center gap-2 active:bg-slate-50 transition-colors shadow-sm"
++                    className="flex-[2] h-12 bg-white border border-trust-border text-brand font-bold rounded-button flex items-center justify-center gap-2 hover:border-brand/30 active:bg-brand-50 transition-all duration-200 shadow-card"
+                   >
+                     <ShoppingCart size={16} />
+                     Quick Sell
+                   </button>
+                   <button
+                     onClick={() => setAdjustTarget(item)}
+-                    className="flex-1 h-12 bg-white border border-slate-100 text-slate-400 font-bold rounded-xl flex items-center justify-center gap-2 active:bg-red-50 transition-colors shadow-sm text-xs"
++                    className="flex-1 h-12 bg-white border border-trust-border-subtle text-trust-text-muted font-semibold rounded-button flex items-center justify-center gap-2 hover:border-warning/30 active:bg-warning-light transition-all duration-200 shadow-card text-label"
+                   >
+                     <AlertTriangle size={14} />
+                     Adjust
+@@ -222,13 +223,14 @@ export default function InventoryList({ items, onAddNew, onBack, onRefresh }: In
+         )}
+       </div>
+ 
+-      {/* FAB ΓÇö Verify + Add */}
+-      <div className="fixed bottom-6 right-6">
++      {/* FAB */}
++      <div className="fixed bottom-7 right-7">
+         <button
+           onClick={onAddNew}
+-          className="w-16 h-16 bg-[#004d40] text-white rounded-[22px] shadow-2xl shadow-[#004d40]/40 flex items-center justify-center active:scale-90 transition-transform"
++          className="w-16 h-16 bg-brand text-white rounded-[18px] shadow-elevated flex items-center justify-center active:scale-90 transition-transform duration-200 relative overflow-hidden"
+         >
+-          <Plus size={28} />
++          <div className="absolute inset-0 rounded-[18px] border border-metallic-light/20" />
++          <Plus size={28} className="relative z-10" />
+         </button>
+       </div>
+ 
+diff --git a/src/components/QuickSellModal.tsx b/src/components/QuickSellModal.tsx
+index e6e1471..7b88517 100644
+--- a/src/components/QuickSellModal.tsx
++++ b/src/components/QuickSellModal.tsx
+@@ -2,34 +2,38 @@
+ 
+ import { useState } from "react";
+ import { motion } from "framer-motion";
+-import { X, ShoppingCart, AlertCircle } from "lucide-react";
++import { ShoppingCart, X, Minus, Plus, Loader2 } from "lucide-react";
+ import { InventoryItem } from "@/lib/types";
+ import { sellFromInventory } from "@/lib/store";
+ 
+ interface QuickSellModalProps {
+   item: InventoryItem;
+   onClose: () => void;
+-  onSold: (remaining: number) => void;
++  onSold: () => void;
+ }
+ 
+ export default function QuickSellModal({ item, onClose, onSold }: QuickSellModalProps) {
+-  const [quantity, setQuantity] = useState("");
++  const [qty, setQty] = useState(1);
++  const [loading, setLoading] = useState(false);
+   const [error, setError] = useState("");
+-  const [success, setSuccess] = useState<number | null>(null);
+ 
+-  const handleSell = () => {
+-    const qty = parseInt(quantity, 10);
+-    if (!qty || qty <= 0) { setError("Enter a valid quantity"); return; }
+-    if (qty > item.total_quantity) { setError(`Only ${item.total_quantity} units available`); return; }
++  const total = qty * (item.selling_price || 0);
+ 
+-    const result = sellFromInventory(item.drug_id, qty);
+-    if (result.success) {
+-      setSuccess(result.remaining);
+-      setTimeout(() => {
+-        onSold(result.remaining);
+-      }, 1500);
+-    } else {
+-      setError("Sale failed ΓÇö insufficient stock");
++  const handleSell = () => {
++    if (qty <= 0 || qty > item.total_quantity) {
++      setError(`Insufficient stock. Only ${item.total_quantity} available.`);
++      return;
++    }
++    setLoading(true);
++    setError("");
++    try {
++      sellFromInventory(item.drug_id, qty);
++      onSold();
++    } catch (e: unknown) {
++      const msg = e instanceof Error ? e.message : "Sale failed";
++      setError(msg);
++    } finally {
++      setLoading(false);
+     }
+   };
+ 
+@@ -38,102 +42,85 @@ export default function QuickSellModal({ item, onClose, onSold }: QuickSellModal
+       <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 1 }}
+-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-60"
++        exit={{ opacity: 0 }}
++        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+         onClick={onClose}
+       />
+       <motion.div
+         initial={{ y: "100%" }}
+         animate={{ y: 0 }}
+-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+-        className="fixed bottom-0 left-0 right-0 z-70 bg-white rounded-t-[32px] shadow-2xl"
++        exit={{ y: "100%" }}
++        transition={{ type: "spring", damping: 32, stiffness: 350 }}
++        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-modal shadow-elevated"
+       >
+-        <div className="p-6">
+-          <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6" />
+-
+-          {success !== null ? (
+-            <motion.div
+-              initial={{ scale: 0.8, opacity: 0 }}
+-              animate={{ scale: 1, opacity: 1 }}
+-              className="flex flex-col items-center py-8 gap-4"
+-            >
+-              <div className="w-20 h-20 bg-green-50 border-2 border-green-100 rounded-full flex items-center justify-center">
+-                <ShoppingCart size={32} className="text-[#2e7d32]" />
+-              </div>
+-              <h3 className="text-xl font-black text-slate-800">Sale Logged</h3>
+-              <p className="text-slate-500 text-sm font-medium">
+-                {success} units remaining in stock
+-              </p>
+-            </motion.div>
+-          ) : (
+-            <>
+-              <div className="flex items-center justify-between mb-6">
+-                <div>
+-                  <h3 className="font-black text-slate-800 text-lg leading-none">{item.drug_name}</h3>
+-                  <p className="text-slate-400 text-sm mt-1 font-medium">{item.total_quantity} units in stock</p>
+-                </div>
+-                <button onClick={onClose} className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
+-                  <X size={20} />
+-                </button>
+-              </div>
++        {/* Header */}
++        <div className="flex items-center justify-between p-7 pb-4 border-b border-trust-border">
++          <div>
++            <h2 className="text-heading-md font-bold text-trust-text tracking-tight">Quick Sale</h2>
++            <p className="text-trust-text-muted text-label font-medium mt-0.5">{item.drug_name}</p>
++          </div>
++          <button onClick={onClose} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
++            <X size={20} />
++          </button>
++        </div>
+ 
+-              {/* Stock indicator */}
+-              <div className="bg-slate-50 rounded-2xl p-4 mb-4 flex items-center gap-3">
+-                <div className="flex-1">
+-                  <div className="flex justify-between text-xs font-bold text-slate-500 uppercase mb-1.5">
+-                    <span>Stock</span>
+-                    <span>{item.total_quantity} units</span>
+-                  </div>
+-                  <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+-                    <div
+-                      className="h-full bg-[#004d40] rounded-full transition-all"
+-                      style={{ width: `${Math.min(100, (item.total_quantity / 200) * 100)}%` }}
+-                    />
+-                  </div>
+-                </div>
+-              </div>
++        <div className="p-7 space-y-6">
++          {/* Quantity selector */}
++          <div className="flex flex-col items-center gap-4">
++            <span className="section-label">Quantity</span>
++            <div className="flex items-center gap-6">
++              <button
++                onClick={() => setQty(Math.max(1, qty - 1))}
++                className="w-14 h-14 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 active:bg-brand-50 transition-colors duration-200 border border-trust-border"
++              >
++                <Minus size={22} />
++              </button>
++              <span className="text-heading-xl font-bold text-trust-text min-w-[4rem] text-center tabular-nums">{qty}</span>
++              <button
++                onClick={() => setQty(Math.min(item.total_quantity, qty + 1))}
++                className="w-14 h-14 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 active:bg-brand-50 transition-colors duration-200 border border-trust-border"
++              >
++                <Plus size={22} />
++              </button>
++            </div>
++            <p className="text-label text-trust-text-muted font-medium">{item.total_quantity} in stock</p>
++          </div>
+ 
+-              <div className="flex flex-col gap-4">
+-                <div>
+-                  <div className="flex justify-between items-end mb-2">
+-                    <label className="text-xs font-black text-slate-500 uppercase tracking-wider block">
+-                      Quantity to Sell
+-                    </label>
+-                    <span className="text-xs font-bold text-[#2e7d32]">
+-                      {item.selling_price ? `Γéª${item.selling_price.toLocaleString()} each` : "No price set"}
+-                    </span>
+-                  </div>
+-                  <input
+-                    type="number"
+-                    inputMode="numeric"
+-                    placeholder="0"
+-                    value={quantity}
+-                    onChange={(e) => { setQuantity(e.target.value); setError(""); }}
+-                    autoFocus
+-                    className="w-full h-16 bg-slate-50 border border-slate-200 rounded-2xl px-4 text-2xl font-black text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#004d40]/30 transition text-center"
+-                  />
+-                </div>
++          {/* Total */}
++          <div className="bg-trust-surface rounded-card p-5 border border-trust-border-subtle text-center">
++            <span className="section-label block mb-1">Total Charge</span>
++            <p className="text-heading-xl font-bold text-brand tabular-nums">Γéª{total.toLocaleString()}</p>
++          </div>
+ 
+-                {error && (
+-                  <div className="flex items-center gap-2 text-red-500 text-sm font-semibold bg-red-50 rounded-xl px-4 py-3">
+-                    <AlertCircle size={16} />
+-                    {error}
+-                  </div>
+-                )}
++          {/* Error */}
++          {error && (
++            <div className="text-danger text-label font-semibold bg-danger-light p-4 rounded-card border border-danger-border">
++              {error}
++            </div>
++          )}
+ 
+-                <button
+-                  onClick={handleSell}
+-                  className="w-full h-14 bg-[#004d40] text-white rounded-2xl font-bold text-base shadow-lg shadow-[#004d40]/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+-                >
++          {/* Actions */}
++          <div className="flex flex-col gap-3">
++            <button
++              onClick={handleSell}
++              disabled={loading}
++              className="btn-primary w-full"
++            >
++              {loading ? <Loader2 size={20} className="animate-spin" /> : (
++                <>
+                   <ShoppingCart size={20} />
+-                  {item.selling_price && parseInt(quantity, 10) > 0 
+-                    ? `Charge Γéª${(parseInt(quantity, 10) * item.selling_price).toLocaleString()}` 
+-                    : "Deduct FIFO"}
+-                </button>
+-              </div>
+-            </>
+-          )}
++                  Confirm Sale ΓÇö Γéª{total.toLocaleString()}
++                </>
++              )}
++            </button>
++            <button
++              onClick={onClose}
++              className="btn-secondary w-full"
++            >
++              Cancel
++            </button>
++          </div>
+         </div>
+-        <div className="h-6" />
+       </motion.div>
+     </>
+   );
+diff --git a/src/components/ScanScreen.tsx b/src/components/ScanScreen.tsx
+index 5ac520a..a673791 100644
+--- a/src/components/ScanScreen.tsx
++++ b/src/components/ScanScreen.tsx
+@@ -3,7 +3,6 @@
+ import { useState } from "react";
+ import { motion } from "framer-motion";
+ import { ArrowLeft, Loader2, Search, Camera } from "lucide-react";
+-import { cn } from "@/lib/utils";
+ 
+ interface ScanScreenProps {
+   onBack: () => void;
+@@ -22,18 +21,18 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
+   };
+ 
+   return (
+-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
++    <div className="fixed inset-0 bg-brand-dark z-50 flex flex-col">
+       {/* Top bar */}
+-      <div className="flex items-center justify-between px-5 pt-14 pb-4 z-10 relative">
++      <div className="flex items-center justify-between px-6 pt-14 pb-5 z-10 relative">
+         <button
+           onClick={onBack}
+-          className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-2xl flex items-center justify-center text-white"
++          className="w-12 h-12 bg-white/10 rounded-button flex items-center justify-center text-white hover:bg-white/15 transition-colors duration-200"
+         >
+           <ArrowLeft size={22} />
+         </button>
+         <div className="text-center">
+-          <h2 className="text-white font-black text-lg leading-none">Find Product</h2>
+-          <p className="text-white/40 text-[11px] font-bold uppercase tracking-widest mt-0.5">
++          <h2 className="text-white font-bold text-heading-md leading-none">Find Product</h2>
++          <p className="text-white/40 text-label-sm font-semibold uppercase tracking-wider mt-1">
+             Manual SKU Search
+           </p>
+         </div>
+@@ -42,27 +41,27 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
+             setShowSoon(true);
+             setTimeout(() => setShowSoon(false), 2000);
+           }}
+-          className="w-12 h-12 bg-white/5 backdrop-blur-lg rounded-2xl flex flex-col items-center justify-center text-white/30 relative overflow-hidden"
++          className="w-12 h-12 bg-white/5 rounded-button flex flex-col items-center justify-center text-white/30 relative overflow-hidden hover:bg-white/10 transition-colors duration-200"
+         >
+           <Camera size={20} />
+           {showSoon && (
+             <motion.div 
+               initial={{ y: 20 }}
+               animate={{ y: 0 }}
+-              className="absolute inset-0 bg-[#0f172a] flex items-center justify-center"
++              className="absolute inset-0 bg-brand flex items-center justify-center rounded-button"
+             >
+-              <span className="text-[8px] font-black uppercase leading-none">Soon</span>
++              <span className="text-label-sm font-bold uppercase leading-none text-white/70">Soon</span>
+             </motion.div>
+           )}
+         </button>
+       </div>
+ 
+-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+-        <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
+-          <Search size={28} className="text-white" />
++      <div className="flex-1 flex flex-col items-center justify-center px-7">
++        <div className="w-16 h-16 bg-white/8 rounded-card flex items-center justify-center mb-7">
++          <Search size={28} className="text-white/80" />
+         </div>
+-        <p className="text-white/60 text-sm font-medium mb-6 text-center px-4">
+-          Enter the Store SKU or NAFDAC ID<br />
++        <p className="text-white/55 text-label font-medium mb-7 text-center px-4 leading-relaxed">
++          Enter the Store SKU or Registration ID<br />
+           exactly as printed on the item
+         </p>
+         <input
+@@ -72,21 +71,21 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
+           value={regNo}
+           onChange={(e) => setRegNo(e.target.value)}
+           onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+-          className="w-full max-w-sm h-16 bg-white/10 backdrop-blur text-white text-xl font-bold text-center rounded-2xl border-2 border-white/20 focus:border-[#0f172a] outline-none placeholder:text-white/20 tracking-wider transition-colors"
++          className="w-full max-w-sm h-16 bg-white/8 text-white text-xl font-bold text-center rounded-input border-2 border-white/15 focus:border-metallic-light focus:shadow-metallic-glow outline-none placeholder:text-white/20 tracking-wider transition-all duration-200"
+         />
+       </div>
+ 
+       {/* Error message */}
+       {errorMessage && (
+-        <div className="mx-6 mb-4 bg-red-500/20 border border-red-500/30 text-red-300 text-sm font-semibold px-4 py-3 rounded-2xl text-center">
++        <div className="mx-7 mb-4 bg-danger/15 border border-danger/25 text-red-300 text-label font-semibold px-5 py-4 rounded-card text-center">
+           {errorMessage}
+         </div>
+       )}
+ 
+       {/* Bottom input area */}
+-      <div className="p-6 pb-10 space-y-3">
++      <div className="p-7 pb-10 space-y-3">
+         {isLoading ? (
+-          <div className="w-full h-14 bg-white/10 rounded-2xl flex items-center justify-center gap-3 text-white font-bold">
++          <div className="w-full h-14 bg-white/8 rounded-button flex items-center justify-center gap-3 text-white font-semibold">
+             <Loader2 size={20} className="animate-spin" />
+             Searching registryΓÇª
+           </div>
+@@ -94,12 +93,11 @@ export default function ScanScreen({ onBack, onVerify, isLoading, errorMessage }
+           <button
+             onClick={handleSubmit}
+             disabled={!regNo.trim()}
+-            className={cn(
+-              "w-full h-14 rounded-2xl font-bold text-base transition-all active:scale-[0.98]",
++            className={`w-full transition-all duration-200 active:scale-[0.98] ${
+               regNo.trim()
+-                ? "bg-[#0f172a] text-white shadow-lg shadow-[#0f172a]/40"
+-                : "bg-white/10 text-white/40"
+-            )}
++                ? "btn-primary shadow-button-lift"
++                : "h-14 bg-white/8 text-white/35 rounded-button font-semibold"
++            }`}
+           >
+             Find Product
+           </button>
+diff --git a/src/components/VerifiedResult.tsx b/src/components/VerifiedResult.tsx
+index b112864..6fe96cc 100644
+--- a/src/components/VerifiedResult.tsx
++++ b/src/components/VerifiedResult.tsx
+@@ -5,6 +5,7 @@ import { CheckCircle, AlertTriangle, XCircle, Plus, FlaskConical, Info } from "l
+ import { cn } from "@/lib/utils";
+ import { Drug } from "@/lib/types";
+ import { getProMode } from "@/lib/store";
++
+ interface VerifiedResultProps {
+   drug: Drug;
+   onClose: () => void;
+@@ -16,31 +17,31 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
+ 
+   const configs = {
+     verified: {
+-      bg: "bg-[#0f172a]",
+-      light: "bg-slate-50 border-slate-100",
+-      icon: <CheckCircle className="text-white" size={40} />,
++      bg: "bg-brand",
++      light: "bg-brand-50 border-brand-100",
++      icon: <CheckCircle className="text-white" size={36} />,
+       header: "Verified",
+       subtext: "Safe for retail sale",
+-      textColor: "text-[#0f172a]",
+-      badge: "bg-slate-100 text-[#0f172a]",
++      textColor: "text-brand",
++      badge: "badge-success",
+     },
+     caution: {
+-      bg: "bg-[#ff8f00]",
+-      light: "bg-amber-50 border-amber-100",
+-      icon: <AlertTriangle className="text-white" size={40} />,
++      bg: "bg-warning",
++      light: "bg-warning-light border-warning-border",
++      icon: <AlertTriangle className="text-white" size={36} />,
+       header: "Caution",
+       subtext: "Verify supply chain before sale",
+-      textColor: "text-[#ff8f00]",
+-      badge: "bg-amber-100 text-[#ff8f00]",
++      textColor: "text-warning",
++      badge: "badge-warning",
+     },
+     not_found: {
+-      bg: "bg-[#c62828]",
+-      light: "bg-red-50 border-red-100",
+-      icon: <XCircle className="text-white" size={40} />,
++      bg: "bg-danger",
++      light: "bg-danger-light border-danger-border",
++      icon: <XCircle className="text-white" size={36} />,
+       header: "Not Verified",
+       subtext: "Item not found in regulatory registry",
+-      textColor: "text-[#c62828]",
+-      badge: "bg-red-100 text-[#c62828]",
++      textColor: "text-danger",
++      badge: "badge-danger",
+     },
+   };
+ 
+@@ -53,7 +54,7 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-end"
++          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-end"
+           onClick={onClose}
+         />
+       </AnimatePresence>
+@@ -62,31 +63,32 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
+         initial={{ y: "100%" }}
+         animate={{ y: 0 }}
+         exit={{ y: "100%" }}
+-        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+-        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[36px] shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
++        transition={{ type: "spring", damping: 30, stiffness: 300 }}
++        className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-modal shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto"
+       >
+         {/* Status strip */}
+-        <div className={cn("p-8 flex flex-col items-center text-center", cfg.bg)}>
+-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4">
++        <div className={cn("p-8 flex flex-col items-center text-center relative", cfg.bg)}>
++          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-metallic-dark via-metallic-light to-metallic-dark opacity-40" />
++          <div className="w-18 h-18 bg-white/15 rounded-full flex items-center justify-center mb-5">
+             {cfg.icon}
+           </div>
+-          <h2 className="text-4xl font-black text-white uppercase tracking-tight leading-none">{cfg.header}</h2>
+-          <p className="text-white/70 text-sm mt-2 font-medium">{cfg.subtext}</p>
++          <h2 className="text-heading-xl font-bold text-white uppercase tracking-tight leading-none">{cfg.header}</h2>
++          <p className="text-white/65 text-label mt-2 font-medium">{cfg.subtext}</p>
+         </div>
+ 
+-        <div className="p-6 flex flex-col gap-4">
++        <div className="p-7 flex flex-col gap-5">
+           {/* Product details card */}
+           {drug.name && drug.name !== "Unknown Drug" && (
+-            <div className={cn("rounded-2xl border p-5", cfg.light)}>
+-              <h3 className="text-lg font-black text-slate-800">{drug.name}</h3>
+-              <div className="grid grid-cols-2 gap-y-3 mt-3">
++            <div className={cn("card p-5", cfg.light)}>
++              <h3 className="text-heading-md font-bold text-trust-text">{drug.name}</h3>
++              <div className="grid grid-cols-2 gap-y-4 mt-4">
+                 <div>
+-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ID / Registration</span>
+-                  <span className="text-sm font-mono font-bold text-slate-700">{drug.nafdac_number}</span>
++                  <span className="section-label block mb-1">ID / Registration</span>
++                  <span className="text-label font-mono font-bold text-trust-text-secondary">{drug.nafdac_number}</span>
+                 </div>
+                 <div>
+-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Manufacturer</span>
+-                  <span className="text-sm font-bold text-slate-700 text-right block">{drug.manufacturer}</span>
++                  <span className="section-label block mb-1">Manufacturer</span>
++                  <span className="text-label font-bold text-trust-text-secondary text-right block">{drug.manufacturer}</span>
+                 </div>
+               </div>
+             </div>
+@@ -94,41 +96,41 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
+ 
+           {/* Professional Mode extras */}
+           {proMode && drug.status !== "not_found" && (drug.composition || drug.drug_class || drug.oncology_notes) && (
+-            <div className="bg-slate-50 rounded-2xl border border-slate-100 p-5">
+-              <div className="flex items-center gap-2 mb-3">
+-                <FlaskConical size={16} className="text-[#0f172a]" />
+-                <span className="text-xs font-black text-[#0f172a] uppercase tracking-wider">Product Deep-Scan</span>
++            <div className="card p-5">
++              <div className="flex items-center gap-2 mb-4">
++                <FlaskConical size={16} className="text-brand" />
++                <span className="section-label text-brand">Product Deep-Scan</span>
+               </div>
+               {drug.composition && (
+-                <div className="mb-2">
+-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Specifications</span>
+-                  <p className="text-sm text-slate-700 font-medium">{drug.composition}</p>
++                <div className="mb-3">
++                  <span className="section-label block mb-1">Specifications</span>
++                  <p className="text-label text-trust-text-secondary font-medium">{drug.composition}</p>
+                 </div>
+               )}
+               {drug.drug_class && (
+-                <div className="mb-2">
+-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Category</span>
+-                  <p className="text-sm text-slate-700 font-medium">{drug.drug_class}</p>
++                <div className="mb-3">
++                  <span className="section-label block mb-1">Category</span>
++                  <p className="text-label text-trust-text-secondary font-medium">{drug.drug_class}</p>
+                 </div>
+               )}
+               {drug.oncology_notes && (
+-                <div className="bg-blue-50 rounded-xl p-3 border border-blue-100 mt-3">
+-                  <div className="flex items-center gap-1 mb-1">
+-                    <Info size={12} className="text-blue-600" />
+-                    <span className="text-[10px] font-black text-blue-600 uppercase">Product Info</span>
++                <div className="bg-blue-50 rounded-card p-4 border border-blue-100 mt-3">
++                  <div className="flex items-center gap-2 mb-2">
++                    <Info size={14} className="text-blue-600" />
++                    <span className="section-label text-blue-600">Product Info</span>
+                   </div>
+-                  <p className="text-xs text-blue-700 font-medium">{drug.oncology_notes}</p>
++                  <p className="text-label text-blue-700 font-medium">{drug.oncology_notes}</p>
+                 </div>
+               )}
+             </div>
+           )}
+ 
+           {/* Actions */}
+-          <div className="flex flex-col gap-3 mt-2">
++          <div className="flex flex-col gap-3 mt-1">
+             {drug.status !== "not_found" && (
+               <button
+                 onClick={onAddStock}
+-                className="w-full h-14 bg-[#0f172a] text-white rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-[#0f172a]/20 active:scale-[0.98] transition-transform"
++                className="btn-primary w-full"
+               >
+                 <Plus size={20} />
+                 Add to Stock
+@@ -136,7 +138,7 @@ export default function VerifiedResult({ drug, onClose, onAddStock }: VerifiedRe
+             )}
+             <button
+               onClick={onClose}
+-              className="w-full h-14 bg-slate-100 text-slate-600 rounded-2xl font-bold text-base active:scale-[0.98] transition-transform"
++              className="btn-secondary w-full"
+             >
+               Done
+             </button>
+diff --git a/tailwind.config.ts b/tailwind.config.ts
+index 3ad1f0e..e35ead8 100644
+--- a/tailwind.config.ts
++++ b/tailwind.config.ts
+@@ -9,19 +9,80 @@ const config: Config = {
+   theme: {
+     extend: {
+       colors: {
+-        primary: "#004d40",
+-        success: "#2e7d32",
+-        warning: "#ff8f00",
+-        danger: "#c62828",
+-        surface: "#f8f9fa",
++        brand: {
++          DEFAULT: "#1B3A4B",
++          light: "#264653",
++          dark: "#122A36",
++          50: "#F0F5F7",
++          100: "#DCE8ED",
++          200: "#B8D0DB",
++        },
++        trust: {
++          surface: "#F5F6F8",
++          card: "#FFFFFF",
++          border: "#E2E5EA",
++          "border-subtle": "#ECEEF2",
++          text: "#1E293B",
++          "text-secondary": "#64748B",
++          "text-muted": "#94A3B8",
++          "text-faint": "#CBD5E1",
++        },
++        success: {
++          DEFAULT: "#16A34A",
++          light: "#F0FDF4",
++          border: "#BBF7D0",
++        },
++        warning: {
++          DEFAULT: "#D97706",
++          light: "#FFFBEB",
++          border: "#FDE68A",
++        },
++        danger: {
++          DEFAULT: "#DC2626",
++          light: "#FEF2F2",
++          border: "#FECACA",
++        },
++        metallic: {
++          light: "#C0C0C0",
++          dark: "#8A8A8A",
++          shine: "#D4D4D8",
++        },
+       },
+       fontFamily: {
+         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+       },
++      fontSize: {
++        "body": ["16px", { lineHeight: "1.5" }],
++        "body-lg": ["18px", { lineHeight: "1.5" }],
++        "label": ["14px", { lineHeight: "1.4", fontWeight: "500" }],
++        "label-sm": ["12px", { lineHeight: "1.3", fontWeight: "600" }],
++        "heading-xl": ["28px", { lineHeight: "1.2", fontWeight: "700" }],
++        "heading-lg": ["22px", { lineHeight: "1.25", fontWeight: "700" }],
++        "heading-md": ["18px", { lineHeight: "1.3", fontWeight: "700" }],
++      },
+       borderRadius: {
+-        "2xl": "1rem",
+-        "3xl": "1.5rem",
+-        "4xl": "2rem",
++        "card": "16px",
++        "button": "12px",
++        "input": "12px",
++        "modal": "24px",
++        "badge": "8px",
++      },
++      boxShadow: {
++        "card": "0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.03)",
++        "card-hover": "0 4px 12px 0 rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04)",
++        "elevated": "0 8px 24px -4px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.04)",
++        "metallic-glow": "0 0 0 1px rgba(192,192,192,0.3), 0 2px 8px -2px rgba(192,192,192,0.15)",
++        "metallic-hover": "0 0 0 1px rgba(192,192,192,0.5), 0 4px 12px -2px rgba(192,192,192,0.25)",
++        "inset-press": "inset 0 2px 4px rgba(0,0,0,0.1)",
++        "button-lift": "0 4px 14px -2px rgba(27, 58, 75, 0.25)",
++      },
++      spacing: {
++        "18": "4.5rem",
++        "22": "5.5rem",
++      },
++      transitionDuration: {
++        "150": "150ms",
++        "200": "200ms",
+       },
+     },
+   },

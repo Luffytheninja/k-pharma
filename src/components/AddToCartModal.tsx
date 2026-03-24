@@ -2,39 +2,28 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, X, Minus, Plus, Loader2 } from "lucide-react";
+import { ShoppingCart, X, Minus, Plus } from "lucide-react";
 import { InventoryItem } from "@/lib/types";
-import { sellFromInventory } from "@/lib/store";
 
-interface QuickSellModalProps {
+interface AddToCartModalProps {
   item: InventoryItem;
   onClose: () => void;
-  onSold: () => void;
+  onAdd: (qty: number) => void;
 }
 
-export default function QuickSellModal({ item, onClose, onSold }: QuickSellModalProps) {
+export default function AddToCartModal({ item, onClose, onAdd }: AddToCartModalProps) {
   const [qty, setQty] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const total = qty * (item.selling_price || 0);
 
-  const handleSell = () => {
+  const handleAdd = () => {
     if (qty <= 0 || qty > item.total_quantity) {
       setError(`Insufficient stock. Only ${item.total_quantity} available.`);
       return;
     }
-    setLoading(true);
     setError("");
-    try {
-      sellFromInventory(item.drug_id, qty);
-      onSold();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Sale failed";
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
+    onAdd(qty);
   };
 
   return (
@@ -56,7 +45,7 @@ export default function QuickSellModal({ item, onClose, onSold }: QuickSellModal
         {/* Header */}
         <div className="flex items-center justify-between p-7 pb-4 border-b border-trust-border">
           <div>
-            <h2 className="text-heading-md font-bold text-trust-text tracking-tight">Quick Sale</h2>
+            <h2 className="text-heading-md font-bold text-trust-text tracking-tight">Add to Cart</h2>
             <p className="text-trust-text-muted text-label font-medium mt-0.5">{item.drug_name}</p>
           </div>
           <button onClick={onClose} className="w-11 h-11 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 transition-colors duration-200">
@@ -102,16 +91,11 @@ export default function QuickSellModal({ item, onClose, onSold }: QuickSellModal
           {/* Actions */}
           <div className="flex flex-col gap-3">
             <button
-              onClick={handleSell}
-              disabled={loading}
+              onClick={handleAdd}
               className="btn-primary w-full"
             >
-              {loading ? <Loader2 size={20} className="animate-spin" /> : (
-                <>
-                  <ShoppingCart size={20} />
-                  Confirm Sale — ₦{total.toLocaleString()}
-                </>
-              )}
+              <ShoppingCart size={20} />
+              Add to Cart — ₦{total.toLocaleString()}
             </button>
             <button
               onClick={onClose}

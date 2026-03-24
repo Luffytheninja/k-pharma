@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Package, Calendar, ShoppingCart, Plus, Search, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InventoryItem } from "@/lib/types";
-import QuickSellModal from "./QuickSellModal";
+import AddToCartModal from "./AddToCartModal";
 import AdjustStockModal from "./AdjustStockModal";
+import CheckoutModal, { CartItem } from "./CheckoutModal";
 
 interface InventoryListProps {
   items: InventoryItem[];
@@ -20,6 +21,20 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
   const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
   const [now] = useState(() => Date.now());
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  const handleAddToCart = (qty: number) => {
+    if (!sellTarget) return;
+    setCart(prev => {
+      const existing = prev.find(c => c.item.drug_id === sellTarget.drug_id);
+      if (existing) {
+        return prev.map(c => c.item.drug_id === sellTarget.drug_id ? { ...c, qty: c.qty + qty } : c);
+      }
+      return [...prev, { item: sellTarget, qty }];
+    });
+    setSellTarget(null);
+  };
 
   const filtered = search.trim()
     ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.drug_reg_no.includes(search))
@@ -199,7 +214,7 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
                     className="flex-[2] btn-primary w-full"
                   >
                     <ShoppingCart size={18} />
-                    Quick Sell
+                    Add to Cart
                   </button>
                   {isAdmin && (
                     <button
@@ -218,7 +233,18 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
       </div>
 
       {/* FAB */}
-      <div className="fixed bottom-7 right-7">
+      <div className="fixed bottom-7 right-7 flex flex-col gap-3 items-end">
+        {cart.length > 0 && (
+          <button
+            onClick={() => setIsCheckoutOpen(true)}
+            className="w-16 h-16 bg-trust-text text-white rounded-[18px] shadow-elevated flex items-center justify-center active:scale-90 transition-transform duration-200 relative overflow-hidden group"
+          >
+            <div className="absolute top-2 right-2 bg-danger text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center leading-none">
+              {cart.reduce((s, c) => s + c.qty, 0)}
+            </div>
+            <ShoppingCart size={26} className="relative z-10 group-hover:-translate-y-0.5 transition-transform" />
+          </button>
+        )}
         <button
           onClick={onAddNew}
           className="w-16 h-16 bg-brand text-white rounded-[18px] shadow-elevated flex items-center justify-center active:scale-90 transition-transform duration-200 relative overflow-hidden"
@@ -229,16 +255,36 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
       </div>
 
       {/* Modals */}
-      {sellTarget && (
-        <QuickSellModal
-          item={sellTarget}
-          onClose={() => setSellTarget(null)}
-          onSold={() => {
-            setSellTarget(null);
-            onRefresh();
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {sellTarget && (
+          <AddToCartModal
+            item={sellTarget}
+            onClose={() => setSellTarget(null)}
+            onAdd={handleAddToCart}
+          />
+        )}
+
+        {isCheckoutOpen && (
+          <CheckoutModal
+            cart={cart}
+            onUpdateQty={(id, delta) => {
+              setCart(prev => prev.map(c => {
+                if (c.item.drug_id === id) {
+                  return { ...c, qty: Math.max(1, Math.min(c.item.total_quantity, c.qty + delta)) };
+                }
+                return c;
+              }));
+            }}
+            onRemove={(id) => setCart(prev => prev.filter(c => c.item.drug_id !== id))}
+            onClose={() => setIsCheckoutOpen(false)}
+            onCompleted={() => {
+              setIsCheckoutOpen(false);
+              setCart([]);
+              onRefresh();
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {adjustTarget && (
         <AdjustStockModal
