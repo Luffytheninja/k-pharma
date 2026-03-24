@@ -57,7 +57,7 @@ export default function AddToStockModal({ drug, onClose, onAdded }: AddToStockMo
       addBatch({
         drug_id: drug.nafdac_number,
         drug_name: drug.name || "Unknown Product",
-        drug_reg_no: drug.nafdac_number,
+        nafdac_number: drug.nafdac_number,
         quantity: parseInt(quantity),
         expiry_date: expiry || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       });

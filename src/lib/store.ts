@@ -31,6 +31,8 @@ export function setPharmacyId(id: string) {
   localStorage.setItem(KEYS.PHARMACY_ID, id);
 }
 
+import bcrypt from 'bcryptjs';
+
 // ─── PIN ──────────────────────────────────────────────
 export function getStoredPin(): string | null {
   if (typeof window === "undefined") return null;
@@ -38,16 +40,17 @@ export function getStoredPin(): string | null {
 }
 
 export function setStoredPin(pin: string) {
-  // Simple hash: in production use bcrypt via API route
-  const hashed = btoa(pin + "k-pharma-salt-v1");
-  localStorage.setItem(KEYS.PIN, hashed);
+  // If the passed pin is already a bcrypt hash (like from DB sync), store it directly.
+  // Otherwise, hash it before storing.
+  const hash = pin.startsWith('$2a$') ? pin : bcrypt.hashSync(pin, 10);
+  localStorage.setItem(KEYS.PIN, hash);
+  return hash;
 }
 
 export function verifyPin(pin: string): boolean {
-  const stored = getStoredPin();
-  if (!stored) return false;
-  const hashed = btoa(pin + "k-pharma-salt-v1");
-  return stored === hashed;
+  const storedHash = getStoredPin();
+  if (!storedHash) return false;
+  return bcrypt.compareSync(pin, storedHash);
 }
 
 // ─── INVENTORY BATCHES ────────────────────────────────
@@ -259,8 +262,7 @@ export async function purgeAllAppData() {
         supabase.from("transactions").delete().eq("pharmacy_id", pid),
         supabase.from("branches").delete().eq("pharmacy_id", pid),
         supabase.from("pharmacies").delete().eq("id", pid),
-        // Drugs cache might be used across, but if they want to clear EVERYTHING...
-        supabase.from("drugs_cache").delete().neq("nafdac_number", ""), 
+        // Removed drugs_cache wipe to prevent wiping global drug catalog
       ]);
     } catch (e) {
       console.error("Cloud purge error", e);
@@ -308,7 +310,7 @@ export function getInventoryItems(): InventoryItem[] {
     items.push({
       drug_id,
       drug_name: sortedBatches[0].drug_name,
-      drug_reg_no: sortedBatches[0].drug_reg_no,
+      nafdac_number: sortedBatches[0].nafdac_number,
       total_quantity: totalQty,
       nearest_expiry: nearestExpiry,
       batches: sortedBatches,
@@ -359,9 +361,9 @@ export async function syncToCloud() {
       }));
       await supabase.from("drugs_cache").upsert(drugsToSync, { onConflict: "nafdac_number" });
     }
-    console.log("[K-Pharma] Background sync complete ✅");
+    console.log("[KO-Mart] Background sync complete ✅");
   } catch (err) {
-    console.error("[K-Pharma] Sync failed:", err);
+    console.error("[KO-Mart] Sync failed:", err);
   }
 }
 
@@ -396,8 +398,8 @@ export async function syncFromCloud() {
       localStorage.setItem(KEYS.DRUG_CACHE, JSON.stringify(cache));
     }
     
-    console.log("[K-Pharma] Background pull complete ✅");
+    console.log("[KO-Mart] Background pull complete ✅");
   } catch (err) {
-    console.error("[K-Pharma] Pull failed:", err);
+    console.error("[KO-Mart] Pull failed:", err);
   }
 }

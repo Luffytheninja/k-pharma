@@ -14,14 +14,15 @@ interface InventoryListProps {
   onAddNew: () => void;
   onRefresh: () => void;
   isAdmin?: boolean;
+  cart: CartItem[];
+  setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
 
-export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = false }: InventoryListProps) {
+export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = false, cart, setCart }: InventoryListProps) {
   const [sellTarget, setSellTarget] = useState<InventoryItem | null>(null);
   const [adjustTarget, setAdjustTarget] = useState<InventoryItem | null>(null);
   const [search, setSearch] = useState("");
   const [now] = useState(() => Date.now());
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const handleAddToCart = (qty: number) => {
@@ -29,7 +30,11 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
     setCart(prev => {
       const existing = prev.find(c => c.item.drug_id === sellTarget.drug_id);
       if (existing) {
-        return prev.map(c => c.item.drug_id === sellTarget.drug_id ? { ...c, qty: c.qty + qty } : c);
+        return prev.map(c => 
+          c.item.drug_id === sellTarget.drug_id 
+            ? { ...c, qty: Math.min(sellTarget.total_quantity, c.qty + qty) } 
+            : c
+        );
       }
       return [...prev, { item: sellTarget, qty }];
     });
@@ -37,7 +42,7 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
   };
 
   const filtered = search.trim()
-    ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.drug_reg_no.includes(search))
+    ? items.filter((i) => i.drug_name.toLowerCase().includes(search.toLowerCase()) || i.nafdac_number.includes(search))
     : items;
 
   const statusConfig = {
@@ -138,7 +143,7 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
                   <div className="flex items-start justify-between mb-5">
                     <div className="flex-1 mr-4">
                       <h3 className="font-bold text-trust-text text-body-lg leading-tight mb-1.5">{item.drug_name}</h3>
-                      <span className="text-label-sm font-mono font-semibold text-trust-text-muted bg-trust-surface px-2.5 py-1 rounded-badge">{item.drug_reg_no}</span>
+                      <span className="text-label-sm font-mono font-semibold text-trust-text-muted bg-trust-surface px-2.5 py-1 rounded-badge">{item.nafdac_number}</span>
                     </div>
                     {(item.status !== "healthy" || daysOfSupply <= 14) && (
                       <span className={cn("badge whitespace-nowrap", cfg.labelClass || "badge-neutral")}>
@@ -259,6 +264,7 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
         {sellTarget && (
           <AddToCartModal
             item={sellTarget}
+            existingQty={cart.find(c => c.item.drug_id === sellTarget.drug_id)?.qty || 0}
             onClose={() => setSellTarget(null)}
             onAdd={handleAddToCart}
           />

@@ -58,7 +58,7 @@ export default function AlertsScreen({ items }: AlertsScreenProps) {
                       <AlertCard
                         key={item.drug_id}
                         title={item.drug_name}
-                        subtitle={`${item.drug_reg_no} · ${item.total_quantity} units`}
+                        subtitle={`${item.nafdac_number} · ${item.total_quantity} units`}
                         flag={days <= 0 ? "Expired" : days === 1 ? "Expires tomorrow" : `${days} days left`}
                         flagClass="badge-danger"
                         icon={<Calendar size={18} className="text-danger" />}
@@ -82,7 +82,7 @@ export default function AlertsScreen({ items }: AlertsScreenProps) {
                     <AlertCard
                       key={item.drug_id}
                       title={item.drug_name}
-                      subtitle={item.drug_reg_no}
+                      subtitle={item.nafdac_number}
                       flag={`${item.total_quantity} units left`}
                       flagClass="badge-warning"
                       icon={<Package size={18} className="text-warning" />}

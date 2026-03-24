@@ -7,19 +7,20 @@ import { InventoryItem } from "@/lib/types";
 
 interface AddToCartModalProps {
   item: InventoryItem;
+  existingQty: number;
   onClose: () => void;
   onAdd: (qty: number) => void;
 }
 
-export default function AddToCartModal({ item, onClose, onAdd }: AddToCartModalProps) {
-  const [qty, setQty] = useState(1);
+export default function AddToCartModal({ item, existingQty, onClose, onAdd }: AddToCartModalProps) {
+  const maxAvailable = Math.max(0, item.total_quantity - existingQty);
+  const [qty, setQty] = useState(Math.min(1, maxAvailable));
   const [error, setError] = useState("");
-
   const total = qty * (item.selling_price || 0);
 
   const handleAdd = () => {
-    if (qty <= 0 || qty > item.total_quantity) {
-      setError(`Insufficient stock. Only ${item.total_quantity} available.`);
+    if (qty <= 0 || qty > maxAvailable) {
+      setError(`Insufficient stock. Only ${maxAvailable} more available.`);
       return;
     }
     setError("");
@@ -66,13 +67,15 @@ export default function AddToCartModal({ item, onClose, onAdd }: AddToCartModalP
               </button>
               <span className="text-heading-xl font-bold text-trust-text min-w-[4rem] text-center tabular-nums">{qty}</span>
               <button
-                onClick={() => setQty(Math.min(item.total_quantity, qty + 1))}
+                onClick={() => setQty(Math.min(maxAvailable, qty + 1))}
                 className="w-14 h-14 bg-trust-surface rounded-button flex items-center justify-center text-trust-text-secondary hover:bg-brand-50 active:bg-brand-50 transition-colors duration-200 border border-trust-border"
               >
                 <Plus size={22} />
               </button>
             </div>
-            <p className="text-label text-trust-text-muted font-medium">{item.total_quantity} in stock</p>
+            <p className="text-label text-trust-text-muted font-medium">
+              {maxAvailable} remaining (already in cart: {existingQty})
+            </p>
           </div>
 
           {/* Total */}

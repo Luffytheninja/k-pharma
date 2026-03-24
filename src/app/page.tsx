@@ -54,6 +54,9 @@ export default function HomePage() {
   const [pendingAdminView, setPendingAdminView] = useState<View | null>(null);
   const [pendingStockDrug, setPendingStockDrug] = useState<Drug | null>(null);
   
+  // Lifted cart state to survive navigation
+  const [cart, setCart] = useState<{ item: InventoryItem; qty: number }[]>([]);
+  
   const isOnline = useOnlineStatus();
 
   useEffect(() => {
@@ -424,7 +427,9 @@ export default function HomePage() {
                   items={inventory} 
                   onAddNew={() => navigateTo("verify")} 
                   onRefresh={refreshInventory} 
-                  isAdmin={isAdminVerified} 
+                  isAdmin={isAdminVerified}
+                  cart={cart}
+                  setCart={setCart}
                 />
               </motion.div>
             )}

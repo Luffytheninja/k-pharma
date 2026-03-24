@@ -1,4 +1,4 @@
-// Shared type definitions for K-Pharma
+// Shared type definitions for KO-Mart
 
 export interface Drug {
   id?: string;
@@ -24,7 +24,7 @@ export interface InventoryBatch {
   pharmacy_id: string;
   drug_id: string;
   drug_name: string;
-  drug_reg_no: string;
+  nafdac_number: string;
   quantity: number;
   expiry_date: string; // ISO date
   added_at: string;
@@ -71,7 +71,7 @@ export interface Alert {
 export interface InventoryItem {
   drug_id: string;
   drug_name: string;
-  drug_reg_no: string;
+  nafdac_number: string;
   total_quantity: number;
   nearest_expiry: string;
   batches: InventoryBatch[];
