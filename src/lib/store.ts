@@ -107,7 +107,7 @@ export function addBatch(batch: Omit<InventoryBatch, "id" | "added_at" | "pharma
 }
 
 // FIFO sell: deducts from oldest batch first
-export function sellFromInventory(drug_id: string, quantity: number): { success: boolean; remaining: number } {
+export function sellFromInventory(drug_id: string, quantity: number, paymentMethod: string = "cash"): { success: boolean; remaining: number } {
   const batches = getBatches();
   const drugBatches = batches
     .filter((b) => b.drug_id === drug_id && b.quantity > 0)
@@ -134,6 +134,7 @@ export function sellFromInventory(drug_id: string, quantity: number): { success:
     quantity: -quantity, // Negative for sale
     type: "sale",
     pharmacy_id: pharmacyId || "local",
+    payment_method: paymentMethod,
     cost_price: cachedDrug?.cost_price,
     selling_price: cachedDrug?.selling_price,
     margin: cachedDrug?.selling_price && cachedDrug?.cost_price ? ((cachedDrug.selling_price - cachedDrug.cost_price) / cachedDrug.selling_price) * 100 : 0

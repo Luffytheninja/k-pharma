@@ -47,7 +47,7 @@ export default function CheckoutModal({ cart, onUpdateQty, onRemove, onClose, on
       }
       
       for (const cartItem of cart) {
-        sellFromInventory(cartItem.item.drug_id, cartItem.qty);
+        sellFromInventory(cartItem.item.drug_id, cartItem.qty, paymentMethod);
       }
 
       const id = Math.random().toString(36).substring(2, 9).toUpperCase();

@@ -41,6 +41,7 @@ export interface Transaction {
   selling_price?: number;
   margin?: number;
   reason?: string;
+  payment_method?: string; // cash | pos | transfer
   sold_at: string;
 }
 
