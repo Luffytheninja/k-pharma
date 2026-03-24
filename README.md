@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KO-Mart (K-Pharma PWA)
 
-## Getting Started
+A premium, secure, and mobile-first Pharmaceutical Management Solution designed for retail pharmacies.
 
-First, run the development server:
+## Core Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **🛡️ Multi-Role Security**: Intelligent switching between **Staff Mode** (Retail) and **Manager Mode** (Admin).
+- **🔒 PIN-Protected Audits**: Sensitive operations like activity logs, stock adjustments, and financial summaries are locked behind a secure PIN.
+- **📱 Mobile-First UX**: Specifically optimized for high-density mobile displays and portrait/landscape tablet modes.
+- **⚖️ Privacy Controls**: Cost prices are automatically hidden during retail sales to ensure wholesale data isn't exposed to customers.
+- **🔍 Smart Verification**: NAFCAC-integrated product scanner and registry verification.
+- **📢 Real-time Alerts**: Automated tracking for low stock and expiring items within 30 days.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 15+ (App Router)
+- **Styling**: Tailwind CSS with custom Design Tokens (Glassmorphism, Neon/Metallic accents)
+- **Database**: Supabase (PostgreSQL + Realtime)
+- **Security**: Local PIN verification + Supabase Auth
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Development
 
-## Learn More
+1. Setup environment variables in `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   ```
+2. Install dependencies: `npm install`
+3. Run dev server: `npm run dev`
 
-To learn more about Next.js, take a look at the following resources:
+## Operations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Staff Mode (Default)
+- **Sell Product**: Record retail sales with simple unit pricing.
+- **Add Stock**: Scan and verify new products into the local cache.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Manager Mode (Enter PIN)
+- **Overview**: Real-time revenue and sales tracking.
+- **Inventory Control**: Bulk adjustments and cost-price tracking.
+- **Audit Trail**: Full historical log of every transaction.
+- **Lock**: Quick-lock functionality to return to Staff Mode instantly.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Designed with ❤️ for Advanced Pharmaceutical Retail.

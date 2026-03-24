@@ -344,8 +344,6 @@ export default function HomePage() {
                   onAddNew={() => navigateTo("verify")} 
                   onRefresh={refreshInventory} 
                   isAdmin={isAdminVerified} 
-                  onSellItem={(item) => setSellingItem(item)} // Added prop
-                  onAdjustItem={(item) => setAdjustingItem(item)} // Added prop
                 />
               </motion.div>
             )}
