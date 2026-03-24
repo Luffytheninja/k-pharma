@@ -16,7 +16,7 @@ import { getInventoryItems, getCachedDrug, cacheDrug } from "@/lib/store";
 import { useOnlineStatus } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
-import { Search, Package, AlertTriangle, History, LogOut, Home, Lock, ShoppingCart, Plus } from "lucide-react";
+import { Search, Package, AlertTriangle, History, LogOut, Home, Lock, ShoppingCart, Plus, ArrowLeft, Shield } from "lucide-react";
 
 type View = "home" | "dashboard" | "verify" | "inventory" | "alerts" | "logs";
 
@@ -162,13 +162,17 @@ export default function HomePage() {
   const TopHeader = () => (
     <header className="md:hidden bg-white border-b border-trust-border px-6 py-4 flex items-center justify-between z-30 shadow-sm sticky top-0 h-16">
       <div className="flex items-center gap-3">
-        {view !== "home" && (
+        {view !== "home" ? (
           <button onClick={() => navigateTo("home")} className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-trust-text-secondary hover:bg-trust-surface transition-colors">
-            {isAdminVerified ? <Lock size={20} className="text-warning" /> : <Home size={20} />}
+            <ArrowLeft size={20} />
           </button>
+        ) : (
+          <div className="w-10 h-10 -ml-2 bg-brand/5 rounded-full flex items-center justify-center text-brand">
+             <Shield size={18} />
+          </div>
         )}
         <h1 className="text-heading-md font-bold text-trust-text tracking-tight uppercase">
-          {view === "home" ? "KO-Mart" : view === "verify" ? "Scanner" : view === "logs" ? "Audit Log" : view === "dashboard" ? "Dashboard" : view}
+          {view === "home" ? "KO-Mart" : view === "verify" ? "Scan/Search" : view === "logs" ? "Audit Log" : view === "dashboard" ? "Admin Dash" : view}
         </h1>
       </div>
       <div className="flex gap-2">
@@ -303,28 +307,95 @@ export default function HomePage() {
           <AnimatePresence mode="wait">
             {view === "home" && (
               <motion.div key="home" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="min-h-full flex flex-col items-center justify-center p-6 md:p-12 gap-6 relative">
-                {!isAdminVerified && (
-                  <button onClick={() => setPendingAdminView("dashboard")} className="absolute top-6 right-6 md:top-8 md:right-8 w-12 h-12 bg-white rounded-full shadow-card flex items-center justify-center text-trust-text-muted hover:text-brand hover:bg-brand-50 transition-colors">
-                    <Lock size={20} />
-                  </button>
-                )}
                 
                 <div className="text-center mb-6">
-                  <h2 className="text-heading-xl font-bold text-trust-text mb-2">Welcome Back</h2>
-                  <p className="text-label text-trust-text-secondary">What would you like to do?</p>
+                  {isAdminVerified ? (
+                    <>
+                      <div className="w-14 h-14 bg-warning/10 text-warning rounded-full flex items-center justify-center mx-auto mb-4 border border-warning/20">
+                        <Shield size={28} />
+                      </div>
+                      <h2 className="text-heading-xl font-bold text-trust-text mb-2">Manager Hub</h2>
+                      <p className="text-label text-trust-text-secondary">Oversee business & inventory operations.</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-14 h-14 bg-brand/5 text-brand rounded-full flex items-center justify-center mx-auto mb-4 border border-brand/20">
+                        <ShoppingCart size={28} />
+                      </div>
+                      <h2 className="text-heading-xl font-bold text-trust-text mb-2">Staff Terminal</h2>
+                      <p className="text-label text-trust-text-secondary">Process sales and handle customer service.</p>
+                    </>
+                  )}
                 </div>
 
                 <div className="w-full max-w-sm flex flex-col gap-4">
-                  <button onClick={() => navigateTo("inventory")} className="w-full h-32 bg-brand text-white rounded-[24px] shadow-metallic-hover hover:-translate-y-1 transition-all duration-200 flex flex-col items-center justify-center gap-3 overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity" />
-                    <ShoppingCart size={32} />
-                    <span className="text-heading-md font-bold">Sell Product</span>
-                  </button>
+                  {/* Primary Clerk Activity: SELL */}
+                  {!isAdminVerified ? (
+                    <>
+                      <button 
+                        onClick={() => navigateTo("inventory")} 
+                        className="w-full h-36 bg-brand text-white rounded-[28px] shadow-metallic-hover hover:-translate-y-1 transition-all duration-200 flex flex-col items-center justify-center gap-4 relative overflow-hidden group p-6"
+                      >
+                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity" />
+                        <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-1">
+                          <ShoppingCart size={32} />
+                        </div>
+                        <div className="text-center">
+                          <span className="text-heading-md font-bold block leading-none">OTC POS SYSTEM</span>
+                          <span className="text-[10px] font-bold uppercase tracking-[2px] opacity-60 mt-2 block">Process Sales</span>
+                        </div>
+                      </button>
 
-                  <button onClick={() => navigateTo("verify")} className="w-full h-32 bg-white border border-trust-border rounded-[24px] shadow-card-hover hover:-translate-y-1 text-brand transition-all duration-200 flex flex-col items-center justify-center gap-3">
-                    <Plus size={32} />
-                    <span className="text-heading-md font-bold">Add Stock</span>
-                  </button>
+                      <button 
+                        onClick={() => setPendingAdminView("dashboard")} 
+                        className="w-full h-24 bg-white border border-trust-border rounded-[24px] shadow-card-hover hover:bg-trust-surface transition-all duration-200 flex items-center gap-4 px-6 group"
+                      >
+                        <div className="w-12 h-12 bg-trust-surface text-trust-text-muted rounded-xl flex items-center justify-center border border-trust-border group-hover:bg-brand group-hover:text-white transition-colors">
+                          <Lock size={20} />
+                        </div>
+                        <div className="text-left">
+                          <span className="text-body font-bold block text-trust-text">Manager Locked</span>
+                          <span className="text-label-sm text-trust-text-secondary">Login to Stock or View Reports</span>
+                        </div>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => navigateTo("dashboard")} 
+                        className="w-full h-32 bg-brand text-white rounded-[28px] shadow-metallic-hover hover:-translate-y-1 transition-all duration-200 flex items-center gap-5 px-6"
+                      >
+                        <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center">
+                          <Package size={28} />
+                        </div>
+                        <div className="text-left">
+                          <span className="text-heading-md font-bold block leading-none">Business Dash</span>
+                          <span className="text-label-sm opacity-60 mt-1 block">Inventory & Analytics</span>
+                        </div>
+                      </button>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <button 
+                          onClick={() => navigateTo("verify")} 
+                          className="h-32 bg-white border border-trust-border rounded-[24px] shadow-card-hover hover:-translate-y-1 transition-all duration-200 flex flex-col items-center justify-center gap-3"
+                        >
+                          <div className="w-12 h-12 bg-success-light text-success rounded-xl flex items-center justify-center">
+                            <Plus size={24} />
+                          </div>
+                          <span className="text-label font-bold text-trust-text">Add Stock</span>
+                        </button>
+                        <button 
+                          onClick={() => navigateTo("logs")} 
+                          className="h-32 bg-white border border-trust-border rounded-[24px] shadow-card-hover hover:-translate-y-1 transition-all duration-200 flex flex-col items-center justify-center gap-3"
+                        >
+                          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                            <History size={24} />
+                          </div>
+                          <span className="text-label font-bold text-trust-text">Audit Logs</span>
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -372,19 +443,36 @@ export default function HomePage() {
           </AnimatePresence>
         </main>
         
-        {/* Mobile Bottom Navigation (Hidden if not Admin) */}
-        {isAdminVerified && (
-          <nav 
-            className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-trust-border flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom)] z-40 shadow-[0_-4px_24px_rgba(0,0,0,0.04)]"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0px)' }}
-          >
-            <MobileTab id="dashboard" icon={Home} label="Overview" />
-            <MobileTab id="inventory" icon={Package} label="Stock" />
-            <MobileTab id="verify" icon={Search} label="Search" />
-            <MobileTab id="alerts" icon={AlertTriangle} label="Alerts" badge={alertCount} />
-            <MobileTab id="logs" icon={History} label="Logs" />
-          </nav>
-        )}
+        {/* Mobile Bottom Navigation (Now always visible for mobility) */}
+        <nav 
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-trust-border flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom)] z-40 shadow-[0_-4px_24px_rgba(0,0,0,0.04)]"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0px)' }}
+        >
+          {isAdminVerified ? (
+            <>
+              <MobileTab id="dashboard" icon={Home} label="Overview" />
+              <MobileTab id="inventory" icon={Package} label="Inventory" />
+              <MobileTab id="verify" icon={Search} label="Search" />
+              <MobileTab id="alerts" icon={AlertTriangle} label="Alerts" badge={alertCount} />
+              <MobileTab id="logs" icon={History} label="Logs" />
+            </>
+          ) : (
+            <>
+              <MobileTab id="home" icon={Home} label="Home" />
+              <MobileTab id="inventory" icon={ShoppingCart} label="Sell" />
+              <MobileTab id="verify" icon={Plus} label="Stock" />
+              <button 
+                onClick={() => setPendingAdminView("dashboard")}
+                className="relative flex flex-col items-center justify-center flex-1 h-full py-1 gap-1"
+              >
+                <div className="flex items-center justify-center w-8 h-8 rounded-full mb-0.5 text-trust-text-muted opacity-50">
+                  <Lock size={18} />
+                </div>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-trust-text-muted opacity-50">Admin</span>
+              </button>
+            </>
+          )}
+        </nav>
       </div>
 
       <AnimatePresence>

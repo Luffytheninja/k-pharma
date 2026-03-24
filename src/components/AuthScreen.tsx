@@ -84,6 +84,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
 
     if (pharmacy) {
       setPharmacyId(pharmacy.id);
+      if (pharmacy.admin_pin) setStoredPin(pharmacy.admin_pin);
       await syncFromCloud();
       onSuccess();
     } else {
@@ -132,7 +133,7 @@ export default function AuthScreen({ onSuccess, initialMode = "login" }: AuthScr
 
       const { data: pharmacy, error: pErr } = await supabase
         .from("pharmacies")
-        .insert([{ name: pharmacyName, owner_id: user.id }])
+        .insert([{ name: pharmacyName, owner_id: user.id, admin_pin: adminPin }])
         .select()
         .single();
 

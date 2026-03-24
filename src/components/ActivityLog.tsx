@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { History, TrendingUp, TrendingDown, Search, Download, Trash2, Calendar } from "lucide-react";
+import { History, TrendingUp, TrendingDown, Search, Download, Trash2 } from "lucide-react";
 import { getTransactions, purgeAllAppData } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -171,7 +171,9 @@ export default function ActivityLog() {
               </p>
               <div className="flex flex-col gap-3">
                 <button 
-                  onClick={purgeAllAppData}
+                  onClick={async () => {
+                    await purgeAllAppData();
+                  }}
                   className="btn-danger w-full py-3.5"
                 >
                   CLEAR EVERYTHING

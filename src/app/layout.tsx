@@ -16,6 +16,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "KO-Mart",
   },
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon-512.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -26,6 +30,9 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import PWARegister from "@/components/PWARegister";
+import InstallPrompt from "@/components/InstallPrompt";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,6 +41,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans select-none overflow-x-hidden">
+        <PWARegister />
+        <InstallPrompt />
         {children}
       </body>
     </html>

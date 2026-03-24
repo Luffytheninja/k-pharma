@@ -248,9 +248,27 @@ export function getLowStockThreshold(): number {
   const raw = localStorage.getItem(KEYS.LOW_STOCK_THRESHOLD);
   return raw ? parseInt(raw, 10) : 10;
 }
-export function purgeAllAppData() {
+export async function purgeAllAppData() {
   if (typeof window === "undefined") return;
+  const pid = getPharmacyId();
+  if (pid) {
+    try {
+      // Clear cloud data for this pharmacy
+      await Promise.allSettled([
+        supabase.from("inventory_batches").delete().eq("pharmacy_id", pid),
+        supabase.from("transactions").delete().eq("pharmacy_id", pid),
+        supabase.from("branches").delete().eq("pharmacy_id", pid),
+        supabase.from("pharmacies").delete().eq("id", pid),
+        // Drugs cache might be used across, but if they want to clear EVERYTHING...
+        supabase.from("drugs_cache").delete().neq("nafdac_number", ""), 
+      ]);
+    } catch (e) {
+      console.error("Cloud purge error", e);
+    }
+  }
+  
   Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
+  await supabase.auth.signOut();
   window.location.reload();
 }
 // ─── DERIVED INVENTORY VIEW ───────────────────────────
@@ -334,6 +352,10 @@ export async function syncToCloud() {
         composition: d.composition ? String(d.composition) : null,
         drug_class: d.drug_class ? String(d.drug_class) : null,
         oncology_notes: d.oncology_notes ? String(d.oncology_notes) : null,
+        cost_price: d.cost_price || 0,
+        selling_price: d.selling_price || 0,
+        reorder_point: d.reorder_point || 10,
+        avg_daily_usage: d.avg_daily_usage || 1,
       }));
       await supabase.from("drugs_cache").upsert(drugsToSync, { onConflict: "nafdac_number" });
     }
@@ -363,6 +385,15 @@ export async function syncFromCloud() {
     
     if (txs) {
       localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(txs));
+    }
+    
+    // Pull drug cache (with pricing)
+    const { data: cache } = await supabase
+      .from("drugs_cache")
+      .select("*");
+    
+    if (cache) {
+      localStorage.setItem(KEYS.DRUG_CACHE, JSON.stringify(cache));
     }
     
     console.log("[K-Pharma] Background pull complete ✅");
