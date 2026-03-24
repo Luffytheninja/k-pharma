@@ -59,8 +59,9 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
   const alertsCount = filtered.filter(i => i.status !== 'healthy').length;
 
   return (
-    <div className="flex flex-col min-h-screen bg-trust-surface p-4 md:p-8">
-      {/* Header with Back Button for Staff/POS navigation */}
+    <div className="flex flex-col min-h-screen bg-trust-surface w-full overflow-x-hidden">
+      <div className="flex-1 w-full max-w-6xl mx-auto p-4 md:p-10">
+        {/* Header with Back Button for Staff/POS navigation */}
       <div className="flex items-center gap-4 mb-6 md:mb-8">
         {onBack && (
           <button 
@@ -320,6 +321,7 @@ export default function InventoryList({ items, onAddNew, onRefresh, isAdmin = fa
           }}
         />
       )}
+      </div>
     </div>
   );
 }

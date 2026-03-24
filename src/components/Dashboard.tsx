@@ -49,7 +49,8 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, ale
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="flex flex-col min-h-screen bg-trust-surface p-4 md:p-8">
+    <div className="flex flex-col min-h-screen bg-trust-surface w-full overflow-x-hidden">
+      <div className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-10 lg:p-12">
       
       {/* ── Welcome Header ── */}
       <div className="mb-6 md:mb-8">
@@ -177,6 +178,7 @@ export default function Dashboard({ onVerify, onInventory, onAlerts, onLogs, ale
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
