@@ -1,3 +1,4 @@
+import type { NextConfig } from "next";
 import withSerwistInit from "@serwist/next";
 
 const withSerwist = withSerwistInit({
@@ -7,6 +8,7 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  turbopack: {},
 };
 
 export default withSerwist(nextConfig);
